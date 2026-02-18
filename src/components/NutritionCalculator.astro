@@ -1,0 +1,244 @@
+---
+// src/components/NutritionCalculator.astro
+---
+
+<nutrition-calculator>
+  <div class="calculator-frame">
+    <div id="form-view" class="view active">
+      <header class="header-lockup">
+        <span class="eyebrow">Phase 01: Input</span>
+        <h2 class="title">Analyze Your Dog</h2>
+      </header>
+
+      <div class="input-stack">
+        <div class="field">
+          <label for="dogName">Dog's Name</label>
+          <input type="text" id="dogName" placeholder="ALFONZO" required />
+        </div>
+        
+        <div class="field">
+          <label for="weight">Weight (lbs)</label>
+          <input type="number" id="weight" placeholder="00" required />
+        </div>
+        
+        <div class="field">
+          <label for="activity">Activity Level</label>
+          <input type="range" id="activity" min="1" max="5" step="1" value="3" />
+          <div class="range-labels">
+            <span>Couch Potato</span>
+            <span>Moderate</span>
+            <span>Athlete</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="calc-btn" class="btn-primary-slick">Calculate Instant Plan</button>
+    </div>
+
+    <div id="result-view" class="view">
+      <div class="prescription-card">
+        <div class="card-inner">
+          <header class="prescription-header">
+            <span class="eyebrow">Vet-Grade Analysis</span>
+            <h2 class="title">Protocol for <span id="res-dog-name"></span></h2>
+          </header>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <span class="label">Daily Caloric Target</span>
+              <div class="value"><span id="res-calories"></span><small>kcal</small></div>
+            </div>
+            <div class="metric">
+              <span class="label">Suggested Serving</span>
+              <div class="value"><span id="res-grams"></span><small>g</small></div>
+            </div>
+          </div>
+
+          <div class="footer-cta">
+            <p>Based on ancestral requirements and RER metabolic math calibrated to your dog's specific activity level.</p>
+            <div class="action-group">
+              <a href="/register" id="claim-btn" class="btn-primary-slick">Claim This Meal Plan</a>
+              <button type="button" class="btn-reset" onclick="location.reload()">Reset Calculator</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nutrition-calculator>
+
+<script>
+  class NutritionCalculator extends HTMLElement {
+    constructor() {
+      super();
+      this.btn = this.querySelector('#calc-btn');
+      this.btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.runEngine();
+      });
+    }
+
+    async runEngine() {
+      const dogName = this.querySelector('#dogName').value;
+      const weightLbs = this.querySelector('#weight').value;
+      const activity = this.querySelector('#activity').value;
+
+      if (!dogName || !weightLbs) {
+        alert("Please provide a name and weight.");
+        return;
+      }
+
+      const payload = {
+        name: dogName,
+        weightKG: parseFloat(weightLbs) / 2.20462,
+        activityLevel: parseInt(activity)
+      };
+
+      try {
+        const response = await fetch('http://localhost:8080/api/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error('Engine Offline');
+        const data = await response.json();
+
+        // Check for transition support
+        if (!document.startViewTransition) {
+          this.performUpdate(data, weightLbs, activity);
+          return;
+        }
+
+        // Trigger the transition
+        document.startViewTransition(() => {
+          this.performUpdate(data, weightLbs, activity);
+        });
+
+      } catch (err) {
+        console.error("Math Engine Error:", err);
+        alert("Could not connect to the Go Logic Engine. Ensure your server is running on port 8080.");
+      }
+    }
+
+    performUpdate(data, weightLbs, activity) {
+      this.querySelector('#form-view').classList.remove('active');
+      this.querySelector('#result-view').classList.add('active');
+
+      this.querySelector('#res-dog-name').textContent = data.dogName;
+      this.querySelector('#res-calories').textContent = Math.round(data.dailyCalories);
+      this.querySelector('#res-grams').textContent = Math.round(data.portionGrams);
+
+      const params = new URLSearchParams({
+        dog_name: data.dogName,
+        weight: weightLbs,
+        calories: Math.round(data.dailyCalories),
+        activity: activity
+      });
+      this.querySelector('#claim-btn').href = `/register?${params.toString()}`;
+    }
+  }
+  customElements.define('nutrition-calculator', NutritionCalculator);
+</script>
+
+<style>
+  :root {
+    --accent: #ff6b6b;
+    --dark: #000000;
+    --border: #e2e8f0;
+    --gray-soft: #94a3b8;
+  }
+
+  .calculator-frame {
+    background: #ffffff;
+    max-width: 800px;
+    margin: 4rem auto;
+    border: 1px solid var(--dark);
+    box-shadow: 20px 20px 0px #f8fafc;
+    min-height: 500px;
+    /* Required for View Transitions to scope correctly within the container */
+    overflow: clip; 
+    contain: layout;
+  }
+
+  .view { padding: 4rem; display: none; width: 100%; }
+  .view.active { display: block; }
+
+  /* --- View Transition Names --- */
+  #form-view { view-transition-name: stage-content; }
+  #result-view { view-transition-name: stage-content; }
+
+  /* --- Header Styling --- */
+  .header-lockup { margin-bottom: 3.5rem; border-left: 6px solid var(--accent); padding-left: 1.5rem; }
+  .eyebrow { font-family: ui-monospace, monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); font-weight: 700; }
+  .title { font-size: 3rem; font-weight: 800; letter-spacing: -0.04em; margin-top: 0.5rem; text-transform: uppercase; }
+
+  /* --- Form Styling --- */
+  .input-stack { margin-bottom: 4rem; display: flex; flex-direction: column; gap: 2.5rem; }
+  .field label { display: block; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; color: var(--gray-soft); margin-bottom: 0.75rem; }
+  
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    font-size: 2.5rem;
+    font-weight: 700;
+    border: none;
+    border-bottom: 3px solid var(--dark);
+    padding: 0.5rem 0;
+    outline: none;
+    background: transparent;
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--dark); margin-top: 1rem; cursor: pointer; }
+  .range-labels { display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #cbd5e1; margin-top: 0.5rem; }
+
+  /* --- Result Styling --- */
+  .prescription-header { border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 3rem; }
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
+  .metric .label { margin-bottom: 1rem; }
+  
+  .metric .value { font-size: 5rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+  .metric .value small { font-size: 1.2rem; font-weight: 600; color: #cbd5e1; margin-left: 0.5rem; text-transform: lowercase; }
+
+  .footer-cta p { font-size: 1.1rem; color: #64748b; margin-bottom: 3rem; line-height: 1.6; max-width: 500px; }
+
+  /* --- Buttons --- */
+  .btn-primary-slick {
+    display: block;
+    background: var(--dark);
+    color: #fff;
+    padding: 1.5rem 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  .btn-primary-slick:hover { background: var(--accent); }
+
+  .action-group { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; }
+  .btn-reset { background: #fff; border: 1px solid var(--border); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; cursor: pointer; color: var(--gray-soft); }
+
+  /* --- Sophisticated Transition Animations --- */
+  ::view-transition-old(stage-content) {
+    animation: 250ms cubic-bezier(0.4, 0, 0.2, 1) both fade-out,
+               250ms cubic-bezier(0.4, 0, 0.2, 1) both scale-down;
+  }
+  ::view-transition-new(stage-content) {
+    animation: 400ms cubic-bezier(0.4, 0, 0.2, 1) both fade-in,
+               400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-up;
+  }
+
+  @keyframes fade-out { to { opacity: 0; } }
+  @keyframes fade-in { from { opacity: 0; } }
+  @keyframes scale-down { to { transform: scale(0.98); } }
+  @keyframes slide-up { from { transform: translateY(30px); } }
+
+  @media (max-width: 600px) {
+    .metric-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .action-group { grid-template-columns: 1fr; }
+    .title { font-size: 2.25rem; }
+  }
+</style>

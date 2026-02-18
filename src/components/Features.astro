@@ -1,0 +1,151 @@
+---
+import type { FeatureItem } from '../types/drupal';
+
+interface Props {
+  field_features_title?: string;
+  features?: FeatureItem[];
+}
+
+const { 
+  field_features_title = "Why ChefPaws?", 
+  features = [] 
+} = Astro.props;
+---
+
+<section class="slick-grid-section">
+  <div class="container">
+    <div class="grid-header">
+      <span class="eyebrow">The Standard</span>
+      <h2 class="title">{field_features_title}</h2>
+    </div>
+
+    <div class="bento-grid">
+      {features.map((item, index) => (
+        <div class="bento-item">
+          <div class="item-header">
+            <span class="item-index">0{index + 1}</span>
+            <h3 class="item-title">{item.field_headline}</h3>
+          </div>
+          <p class="item-text">{item.field_description}</p>
+          <div class="corner-accent"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .slick-grid-section {
+    padding: 10rem 2rem;
+    background: #ffffff;
+    color: #0f172a;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* --- Dynamic Header with Architectural Ledge --- */
+  .grid-header {
+    margin-bottom: 6rem;
+    border-left: 8px solid #ff6b6b;
+    padding-left: 2.5rem;
+  }
+
+  .eyebrow {
+    font-size: 0.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: #ff6b6b;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .title {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    line-height: 0.85;
+    margin: 0;
+  }
+
+  /* --- Bento Grid Structure --- */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .bento-item {
+    background: #fafafa;
+    padding: 4rem;
+    border: 1px solid #eef2f6;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 350px;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .bento-item:hover {
+    border-color: #ff6b6b;
+    background: #fff;
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.1);
+  }
+
+  .item-header {
+    margin-bottom: 2rem;
+  }
+
+  .item-index {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #ff6b6b;
+    display: block;
+    margin-bottom: 1.5rem;
+  }
+
+  .item-title {
+    font-size: 1.85rem;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .item-text {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #475569;
+    max-width: 440px;
+    font-weight: 500;
+  }
+
+  .corner-accent {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, transparent 50%, #f1f5f9 50%);
+    transition: opacity 0.3s ease;
+  }
+
+  .bento-item:hover .corner-accent {
+    opacity: 0.5;
+  }
+
+  /* Responsive Logic */
+  @media (max-width: 1024px) {
+    .bento-grid { grid-template-columns: 1fr; }
+    .bento-item { padding: 3rem; min-height: auto; }
+  }
+</style>

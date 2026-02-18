@@ -1,17 +1,35 @@
 ---
+import Layout from '../Layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import FeaturesGrid from '../components/Features.astro'; // Assuming this is your grid component
+import type { HomepageResponse, Section } from '../types/drupal';
 
+// 1. Fetch the dynamic data from your Go Logic Engine
+const response = await fetch('http://localhost:8080/homepage');
+const data: HomepageResponse = await response.json();
+
+// 2. Map the Drupal Paragraph Types to your Astro Components
+// We use 'as const' and keyof to keep TypeScript happy on your MacBook Pro
+const COMPONENTS = {
+  'paragraph--hero': Hero,
+  'paragraph--features_grid': FeaturesGrid,
+} as const;
+
+type ComponentKey = keyof typeof COMPONENTS;
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title={data.title}>
+  {data.sections.map((section: Section) => {
+    // 3. Dynamic component selection
+    const Component = COMPONENTS[section.type as ComponentKey];
+    
+    // 4. Render if the component exists, passing the content as props
+    return Component ? <Component {...(section.content as any)} /> : null;
+  })}
+  
+  {/* You can still keep your static CTA here if it's not in Drupal yet */}
+  <section class="cta-banner">
+    <h2>Ready to see the math for Alfonzo?</h2>
+    <a href="/dashboard" class="btn-primary">View Current Clients</a>
+  </section>
+</Layout>
