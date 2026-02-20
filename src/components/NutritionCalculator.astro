@@ -1,67 +1,187 @@
 ---
-// src/components/NutritionCalculator.astro
+import { ClientRouter } from 'astro:transitions';
 ---
+<head>
+  <ClientRouter />
+</head>
 
-<nutrition-calculator>
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+  
+  :root { 
+    --brand-dark: #121212; 
+    --brand-accent: #ff6b6b; 
+    --brand-soft: #f8f8f6; 
+    --brand-surface: #ffffff; 
+    --text-muted: #8e8e93; 
+    --border-light: #eeeeee; 
+    --shadow-soft: 0 20px 40px rgba(0,0,0,0.04);
+  }
+
+  nutrition-calculator { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    display: block; 
+    background-color: var(--brand-soft); 
+    padding: 4rem 1rem; 
+    min-height: 100vh; 
+  }
+
+  .calculator-frame { 
+    background: var(--brand-surface); 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    border-radius: 48px; 
+    box-shadow: var(--shadow-soft); 
+    overflow: hidden; 
+  }
+  
+  .view { padding: 5rem; display: none; }
+  .view.active { display: block; animation: smoothReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  
+  @keyframes smoothReveal { 
+    from { opacity: 0; transform: translateY(30px); } 
+    to { opacity: 1; transform: translateY(0); } 
+  }
+
+  .title-display { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 10vw, 7rem); line-height: 0.85; margin-bottom: 2.5rem; text-transform: uppercase; letter-spacing: -0.02em; }
+  .eyebrow-accent { font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--brand-accent); margin-bottom: 1.5rem; display: block; }
+  
+  .metric-hero-modern { background: var(--brand-dark); color: white; padding: 5rem 2rem; border-radius: 40px; margin-bottom: 5rem; text-align: center; }
+  .hero-value-polished { font-family: 'Bebas Neue', sans-serif; font-size: clamp(6rem, 18vw, 12rem); line-height: 0.8; display: flex; justify-content: center; align-items: baseline; }
+  .hero-value-polished .unit { font-family: 'Plus Jakarta Sans'; font-size: 1.1rem; font-weight: 800; opacity: 0.4; margin-left: 1.5rem; letter-spacing: 0.1em; }
+
+  .selection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; width: 100%; }
+  
+  .glass-card-modern { 
+    background: white; 
+    border: 1.5px solid var(--border-light); 
+    border-radius: 40px; 
+    padding: 4rem 3rem; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+    cursor: pointer;
+  }
+
+  .glass-card-modern:hover { transform: translateY(-10px); border-color: var(--brand-dark); }
+  .glass-card-modern.selected { border-color: var(--brand-accent); background-color: #fff9f9; transform: scale(1.02); }
+
+  .plan-count { font-family: 'Bebas Neue', sans-serif; font-size: 7rem; line-height: 1; color: var(--brand-dark); margin-bottom: 0.5rem; }
+  .plan-count span { font-size: 1.2rem; color: var(--brand-accent); vertical-align: super; text-transform: uppercase; font-weight: 800; }
+  .card-label { font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+  .card-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 3rem; flex-grow: 1; }
+
+  .pill-action-trigger {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--brand-dark) !important;
+    color: #ffffff !important;
+    height: 60px !important;
+    width: 100% !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    border-radius: 100px !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    cursor: pointer !important;
+    transition: all 0.4s ease !important;
+    border: none !important;
+    text-decoration: none !important;
+  }
+  
+  .pill-action-trigger:hover { background-color: var(--brand-accent) !important; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 107, 107, 0.2); }
+  .pill-action-trigger.disabled { opacity: 0.15; pointer-events: none; }
+
+  .unit-g { text-transform: lowercase !important; font-family: 'Plus Jakarta Sans', sans-serif !important; font-size: 0.9rem; font-weight: 800; color: var(--brand-dark); margin-left: 1px; }
+
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 4rem; }
+  .field { display: flex; flex-direction: column; background: #f9f9f7; padding: 1.5rem 2rem; border-radius: 20px; transition: 0.3s; text-align: left; }
+  .field:focus-within { background: white; box-shadow: 0 0 0 2px var(--brand-dark); }
+  .field label { font-weight: 800; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.5rem; }
+  
+  input, textarea { background: transparent; border: none; outline: none; font-family: inherit; font-size: 1.25rem; font-weight: 700; color: var(--brand-dark); width: 100%; }
+
+  .hidden { display: none !important; }
+  .success-state { text-align: center; padding: 4rem 0; animation: fadeUp 0.6s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .btn-minimal { margin-top: 4rem; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; opacity: 0.3; transition: 0.3s; border: none; background: none; width: 100%; text-align: center; }
+  .btn-minimal:hover { opacity: 1; color: var(--brand-accent); }
+
+  @media (max-width: 768px) {
+    .view { padding: 3rem 1.5rem; }
+    .input-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  }
+</style>
+
+<nutrition-calculator data-api-url={import.meta.env.PUBLIC_API_URL || 'http://localhost:8080'}>
   <div class="calculator-frame">
-    <div id="form-view" class="view active">
-      <header class="header-lockup">
-        <span class="eyebrow">Phase 01: Input</span>
-        <h2 class="title">Analyze Your Dog</h2>
-      </header>
-
-      <div class="input-stack">
+    <div id="phase-1" class="view active">
+      <span class="eyebrow-accent">Phase 01: Biological Input</span>
+      <h2 class="title-display">Analyze Your Dog</h2>
+      <div class="input-grid" style="grid-template-columns: 1fr;">
+        <div class="field"><label>Dog's Name</label><input type="text" id="dogName" placeholder="e.g. Tony" required /></div>
+        <div class="field"><label>Weight (lbs)</label><input type="number" id="weight" placeholder="00" required /></div>
         <div class="field">
-          <label for="dogName">Dog's Name</label>
-          <input type="text" id="dogName" placeholder="ALFONZO" required />
-        </div>
-        
-        <div class="field">
-          <label for="weight">Weight (lbs)</label>
-          <input type="number" id="weight" placeholder="00" required />
-        </div>
-        
-        <div class="field">
-          <label for="activity">Activity Level</label>
-          <input type="range" id="activity" min="1" max="5" step="1" value="3" />
-          <div class="range-labels">
-            <span>Couch Potato</span>
-            <span>Moderate</span>
-            <span>Athlete</span>
-          </div>
+          <label>Activity Level</label>
+          <input type="range" id="activity" min="1" max="5" step="1" value="3" style="cursor:pointer; margin-top:1rem;" />
         </div>
       </div>
-
-      <button id="calc-btn" class="btn-primary-slick">Calculate Instant Plan</button>
+      <div class="pill-action-trigger" id="calc-btn"><span>Analyze Biology</span></div>
     </div>
 
-    <div id="result-view" class="view">
-      <div class="prescription-card">
-        <div class="card-inner">
-          <header class="prescription-header">
-            <span class="eyebrow">Vet-Grade Analysis</span>
-            <h2 class="title">Protocol for <span id="res-dog-name"></span></h2>
-          </header>
+    <div id="phase-2" class="view">
+      <span class="eyebrow-accent">Phase 02: Frequency</span>
+      <h2 class="title-display">Select Duration</h2>
+      <div class="metric-hero-modern">
+        <span class="metric-label" style="text-transform:uppercase; font-size:0.7rem; letter-spacing:0.3em; opacity:0.4; display:block; margin-bottom:1rem;">Daily Energy Target</span>
+        <div class="hero-value-polished"><span id="res-cals"></span><span class="unit">KCAL / DAY</span></div>
+      </div>
+      <div class="selection-grid">
+        <div class="glass-card-modern select-plan-btn" data-plan="5"><div class="plan-count">5 <span>Days</span></div><div class="card-label">The Taster</div><p class="card-desc">Perfect for testing the raw transition for <span class="dog-name-insert"></span>.</p><div class="pill-action-trigger"><span>Select</span></div></div>
+        <div class="glass-card-modern select-plan-btn" data-plan="10"><div class="plan-count">10 <span>Days</span></div><div class="card-label">The Standard</div><p class="card-desc">The most popular choice for long-term health.</p><div class="pill-action-trigger"><span>Select</span></div></div>
+        <div class="glass-card-modern select-plan-btn" data-plan="20"><div class="plan-count">20 <span>Days</span></div><div class="card-label">The Pro</div><p class="card-desc">Ideal for high-performance and multi-pet homes.</p><div class="pill-action-trigger"><span>Select</span></div></div>
+      </div>
+      <button class="btn-minimal" id="reset-to-phase-1">Reset Analysis</button>
+    </div>
 
-          <div class="metric-grid">
-            <div class="metric">
-              <span class="label">Daily Caloric Target</span>
-              <div class="value"><span id="res-calories"></span><small>kcal</small></div>
-            </div>
-            <div class="metric">
-              <span class="label">Suggested Serving</span>
-              <div class="value"><span id="res-grams"></span><small>g</small></div>
-            </div>
-          </div>
-
-          <div class="footer-cta">
-            <p>Based on ancestral requirements and RER metabolic math calibrated to your dog's specific activity level.</p>
-            <div class="action-group">
-              <a href="/register" id="claim-btn" class="btn-primary-slick">Claim This Meal Plan</a>
-              <button type="button" class="btn-reset" onclick="location.reload()">Reset Calculator</button>
-            </div>
-          </div>
+    <div id="phase-3" class="view">
+        <span class="eyebrow-accent">Phase 03: Formulations</span>
+        <h2 class="title-display">Craft the Box</h2>
+        <p style="margin-bottom: 4rem; color: var(--text-muted); font-weight: 500;">Select one or more recipes to include in <span id="res-name-3" style="color:var(--brand-dark); font-weight: 800;"></span>'s rotation.</p>
+        <div id="recipe-list" class="selection-grid"></div>
+        <div style="text-align: center; margin-top: 5rem;">
+            <div class="pill-action-trigger disabled" id="confirm-menu-btn"><span>Confirm Selection</span></div>
+            <button class="btn-minimal" id="back-to-plans">Adjust Duration</button>
         </div>
+    </div>
+
+    <div id="phase-4" class="view">
+      <div id="lead-form-container">
+          <span class="eyebrow-accent">Phase 04: Finalize</span>
+          <h2 class="title-display">Secure Your Spot</h2>
+          <form id="lead-capture-form">
+            <div class="input-grid">
+              <div class="field"><label>Full Name</label><input type="text" id="userName" required /></div>
+              <div class="field"><label>Email Address</label><input type="email" id="userEmail" required /></div>
+              <div class="field"><label>Phone Number</label><input type="tel" id="userPhone" required /></div>
+              <div class="field"><label>Zip Code</label><input type="text" id="userZip" required /></div>
+              <div class="field" style="grid-column: span 2;"><label>Special Requirements</label><textarea id="userMessage" placeholder="Allergies, delivery notes..."></textarea></div>
+            </div>
+            <div class="pill-action-trigger" id="submit-lead-btn"><span>Request Roadmap</span></div>
+          </form>
+      </div>
+
+      <div id="success-message" class="hidden success-state">
+          <h2 class="title-display" style="font-size: 4rem;">Blueprint Sent</h2>
+          <p style="font-weight: 600; color: var(--brand-dark);">Your analysis is being processed. We will contact you at the number provided to finalize your custom formulation.</p>
+          <button class="btn-minimal" onclick="location.reload()">Start New Analysis</button>
       </div>
     </div>
   </div>
@@ -71,174 +191,125 @@
   class NutritionCalculator extends HTMLElement {
     constructor() {
       super();
+      // Get the API URL from the data attribute set in Astro
+      this.apiUrl = this.getAttribute('data-api-url');
+      
       this.btn = this.querySelector('#calc-btn');
-      this.btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.runEngine();
+      this.leadSubmitBtn = this.querySelector('#submit-lead-btn');
+      this.confirmMenuBtn = this.querySelector('#confirm-menu-btn');
+      this.backBtn = this.querySelector('#back-to-plans');
+      this.resetBtn = this.querySelector('#reset-to-phase-1');
+      
+      this.calcData = null;
+      this.selectedPlan = null;
+      this.selectedRecipes = new Set();
+
+      this.btn?.addEventListener('click', () => this.runEngine());
+      this.querySelectorAll('.select-plan-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          this.selectedPlan = e.currentTarget.dataset.plan;
+          this.transition('phase-2', 'phase-3');
+        });
       });
+      this.confirmMenuBtn?.addEventListener('click', () => {
+        if (this.selectedRecipes.size > 0) this.transition('phase-3', 'phase-4');
+      });
+      this.backBtn?.addEventListener('click', () => this.transition('phase-3', 'phase-2'));
+      this.resetBtn?.addEventListener('click', () => this.transition('phase-2', 'phase-1'));
+      this.leadSubmitBtn?.addEventListener('click', () => this.submitLead());
     }
 
     async runEngine() {
       const dogName = this.querySelector('#dogName').value;
       const weightLbs = this.querySelector('#weight').value;
       const activity = this.querySelector('#activity').value;
-
-      if (!dogName || !weightLbs) {
-        alert("Please provide a name and weight.");
-        return;
-      }
-
-      const payload = {
-        name: dogName,
-        weightKG: parseFloat(weightLbs) / 2.20462,
-        activityLevel: parseInt(activity)
-      };
-
+      if (!dogName || !weightLbs) return alert("Please fill out Name and Weight");
+      
+      this.btn.querySelector('span').textContent = 'Analyzing...';
       try {
-        const response = await fetch('http://localhost:8080/api/calculate', {
+        const response = await fetch(`${this.apiUrl}/api/calculate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ name: dogName, weightKG: parseFloat(weightLbs) / 2.20462, activityLevel: parseInt(activity) })
         });
-
-        if (!response.ok) throw new Error('Engine Offline');
-        const data = await response.json();
-
-        // Check for transition support
-        if (!document.startViewTransition) {
-          this.performUpdate(data, weightLbs, activity);
-          return;
-        }
-
-        // Trigger the transition
-        document.startViewTransition(() => {
-          this.performUpdate(data, weightLbs, activity);
+        this.calcData = await response.json();
+        this.querySelector('#res-cals').textContent = Math.round(this.calcData.dailyCalories);
+        this.querySelector('#res-name-3').textContent = dogName;
+        this.querySelectorAll('.dog-name-insert').forEach(el => el.textContent = dogName);
+        this.transition('phase-1', 'phase-2', () => {
+            this.btn.querySelector('span').textContent = 'Analyze Biology';
+            this.renderRecipes();
         });
-
-      } catch (err) {
-        console.error("Math Engine Error:", err);
-        alert("Could not connect to the Go Logic Engine. Ensure your server is running on port 8080.");
+      } catch (err) { 
+        console.error(err);
+        this.btn.querySelector('span').textContent = 'Analyze Biology';
       }
     }
 
-    performUpdate(data, weightLbs, activity) {
-      this.querySelector('#form-view').classList.remove('active');
-      this.querySelector('#result-view').classList.add('active');
-
-      this.querySelector('#res-dog-name').textContent = data.dogName;
-      this.querySelector('#res-calories').textContent = Math.round(data.dailyCalories);
-      this.querySelector('#res-grams').textContent = Math.round(data.portionGrams);
-
-      const params = new URLSearchParams({
-        dog_name: data.dogName,
-        weight: weightLbs,
-        calories: Math.round(data.dailyCalories),
-        activity: activity
+    renderRecipes() {
+      const listContainer = this.querySelector('#recipe-list');
+      listContainer.innerHTML = '';
+      this.calcData.recipes.forEach(recipe => {
+        const card = document.createElement('div');
+        card.className = 'glass-card-modern';
+        card.innerHTML = `
+          <div class="recipe-name-mini" style="font-family:Bebas Neue; font-size:3.5rem; line-height:0.9; margin-bottom: 1.5rem;">${recipe.recipeName}</div>
+          <p class="card-desc">${recipe.ingredients}</p>
+          <div style="font-weight:800; font-size: 1.4rem; color:var(--brand-dark);">${recipe.portionGrams}<span class="unit-g">g</span></div>
+          <div style="font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.5rem; opacity:0.4;">Daily Prep</div>
+        `;
+        
+        card.addEventListener('click', () => {
+          if (this.selectedRecipes.has(recipe.recipeName)) {
+            this.selectedRecipes.delete(recipe.recipeName);
+            card.classList.remove('selected');
+          } else {
+            this.selectedRecipes.add(recipe.recipeName);
+            card.classList.add('selected');
+          }
+          this.confirmMenuBtn.classList.toggle('disabled', this.selectedRecipes.size === 0);
+        });
+        listContainer.appendChild(card);
       });
-      this.querySelector('#claim-btn').href = `/register?${params.toString()}`;
+    }
+
+    transition(fromId, toId, callback) {
+      const switchView = () => {
+        this.querySelector(`#${fromId}`).classList.remove('active');
+        this.querySelector(`#${toId}`).classList.add('active');
+        if (callback) callback();
+      };
+      if (document.startViewTransition) document.startViewTransition(switchView); else switchView();
+    }
+
+    async submitLead() {
+        this.leadSubmitBtn.querySelector('span').textContent = "Securing Spot...";
+        const payload = {
+            dogName: this.querySelector('#dogName').value,
+            selectedPlan: this.selectedPlan,
+            selectedRecipes: Array.from(this.selectedRecipes),
+            name: this.querySelector('#userName').value,
+            email: this.querySelector('#userEmail').value,
+            phone: this.querySelector('#userPhone').value,
+            zip: this.querySelector('#userZip').value,
+            message: this.querySelector('#userMessage').value,
+            calories: Math.round(this.calcData.dailyCalories)
+        };
+        try {
+            const res = await fetch(`${this.apiUrl}/api/lead`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                this.querySelector('#lead-form-container').classList.add('hidden');
+                this.querySelector('#success-message').classList.remove('hidden');
+            }
+        } catch (e) { 
+            alert("Connection error. Is the Go server running?");
+            this.leadSubmitBtn.querySelector('span').textContent = "Request Roadmap";
+        }
     }
   }
   customElements.define('nutrition-calculator', NutritionCalculator);
 </script>
-
-<style>
-  :root {
-    --accent: #ff6b6b;
-    --dark: #000000;
-    --border: #e2e8f0;
-    --gray-soft: #94a3b8;
-  }
-
-  .calculator-frame {
-    background: #ffffff;
-    max-width: 800px;
-    margin: 4rem auto;
-    border: 1px solid var(--dark);
-    box-shadow: 20px 20px 0px #f8fafc;
-    min-height: 500px;
-    /* Required for View Transitions to scope correctly within the container */
-    overflow: clip; 
-    contain: layout;
-  }
-
-  .view { padding: 4rem; display: none; width: 100%; }
-  .view.active { display: block; }
-
-  /* --- View Transition Names --- */
-  #form-view { view-transition-name: stage-content; }
-  #result-view { view-transition-name: stage-content; }
-
-  /* --- Header Styling --- */
-  .header-lockup { margin-bottom: 3.5rem; border-left: 6px solid var(--accent); padding-left: 1.5rem; }
-  .eyebrow { font-family: ui-monospace, monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); font-weight: 700; }
-  .title { font-size: 3rem; font-weight: 800; letter-spacing: -0.04em; margin-top: 0.5rem; text-transform: uppercase; }
-
-  /* --- Form Styling --- */
-  .input-stack { margin-bottom: 4rem; display: flex; flex-direction: column; gap: 2.5rem; }
-  .field label { display: block; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; color: var(--gray-soft); margin-bottom: 0.75rem; }
-  
-  input[type="text"], input[type="number"] {
-    width: 100%;
-    font-size: 2.5rem;
-    font-weight: 700;
-    border: none;
-    border-bottom: 3px solid var(--dark);
-    padding: 0.5rem 0;
-    outline: none;
-    background: transparent;
-  }
-
-  input[type="range"] { width: 100%; accent-color: var(--dark); margin-top: 1rem; cursor: pointer; }
-  .range-labels { display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #cbd5e1; margin-top: 0.5rem; }
-
-  /* --- Result Styling --- */
-  .prescription-header { border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 3rem; }
-  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
-  .metric .label { margin-bottom: 1rem; }
-  
-  .metric .value { font-size: 5rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
-  .metric .value small { font-size: 1.2rem; font-weight: 600; color: #cbd5e1; margin-left: 0.5rem; text-transform: lowercase; }
-
-  .footer-cta p { font-size: 1.1rem; color: #64748b; margin-bottom: 3rem; line-height: 1.6; max-width: 500px; }
-
-  /* --- Buttons --- */
-  .btn-primary-slick {
-    display: block;
-    background: var(--dark);
-    color: #fff;
-    padding: 1.5rem 3rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: background 0.2s ease;
-  }
-  .btn-primary-slick:hover { background: var(--accent); }
-
-  .action-group { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; }
-  .btn-reset { background: #fff; border: 1px solid var(--border); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; cursor: pointer; color: var(--gray-soft); }
-
-  /* --- Sophisticated Transition Animations --- */
-  ::view-transition-old(stage-content) {
-    animation: 250ms cubic-bezier(0.4, 0, 0.2, 1) both fade-out,
-               250ms cubic-bezier(0.4, 0, 0.2, 1) both scale-down;
-  }
-  ::view-transition-new(stage-content) {
-    animation: 400ms cubic-bezier(0.4, 0, 0.2, 1) both fade-in,
-               400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-up;
-  }
-
-  @keyframes fade-out { to { opacity: 0; } }
-  @keyframes fade-in { from { opacity: 0; } }
-  @keyframes scale-down { to { transform: scale(0.98); } }
-  @keyframes slide-up { from { transform: translateY(30px); } }
-
-  @media (max-width: 600px) {
-    .metric-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .action-group { grid-template-columns: 1fr; }
-    .title { font-size: 2.25rem; }
-  }
-</style>

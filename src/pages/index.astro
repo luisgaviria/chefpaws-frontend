@@ -5,7 +5,9 @@ import FeaturesGrid from '../components/Features.astro'; // Assuming this is you
 import type { HomepageResponse, Section } from '../types/drupal';
 
 // 1. Fetch the dynamic data from your Go Logic Engine
-const response = await fetch('http://localhost:8080/homepage');
+// This looks for the Railway variable first, falling back to local for your dev work
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
+const response = await fetch(`${API_URL}/homepage`);
 const data: HomepageResponse = await response.json();
 
 // 2. Map the Drupal Paragraph Types to your Astro Components
