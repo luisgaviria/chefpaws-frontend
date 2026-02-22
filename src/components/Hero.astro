@@ -9,9 +9,16 @@ interface Props {
 const { 
   field_title = "Nutrition as Unique as They Are", 
   field_subtitle = "Stop guessing. Get vet-grade meal portions calculated specifically for your dog.",
-  field_media = "/dog-hero.png",
+  field_media: rawMedia = "/dog-hero.png",
   field_badge = "New: Fresh Beef Recipe"
 } = Astro.props;
+
+// CLEANUP LOGIC:
+// If the URL contains "http", it's already an absolute Cloudflare link.
+// We only want to use the string as-is without adding the Heroku prefix.
+const field_media = rawMedia.startsWith('http') 
+  ? rawMedia 
+  : rawMedia;
 ---
 
 
