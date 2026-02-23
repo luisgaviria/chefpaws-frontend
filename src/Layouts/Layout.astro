@@ -28,12 +28,15 @@ const { title } = Astro.props;
 </html>
 
 <style is:global>
-  :root {
-    --brand: #ff6b6b;
-    --bg: #fafafa;
-    --card-bg: #ffffff;
+  :root { 
+    --brand-dark: #121212; 
+    --brand-accent: #ff6b6b; 
+    --brand-soft: #f8f8f6; 
+    --brand-surface: #ffffff; 
+    --text-muted: #8e8e93; 
+    --border-light: #eeeeee; 
+    --shadow-soft: 0 20px 40px rgba(0,0,0,0.04);
   }
-
   /* 1. Global Safety Reset */
   *, *::before, *::after {
     box-sizing: border-box; /* Padding won't push width past 100% */
