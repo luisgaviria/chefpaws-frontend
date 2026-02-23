@@ -1,23 +1,160 @@
----
----
-<nav class="navbar">
-	<div class="container">
-		<a href="/" class="logo">ChefPaws 🐾</a>
-		<div class="links">
-			<a href="/">Home</a>
-			<a href="/dashboard">Dashboard</a>
-			<a href="/recipes">Recipes</a>
-		</div>
-	</div>
+<nav class="navbar" transition:persist>
+  <div class="nav-container">
+    <a href="/" class="logo">
+      CHEFPAWS <span class="paw">🐾</span>
+    </a>
+    
+    <div class="nav-links">
+      <a href="/" class="nav-item">Home</a>
+      <a href="/dashboard" class="nav-item">Dashboard</a>
+      <a href="/recipes" class="nav-item">Recipes</a>
+      <a href="/analyze" class="cta-pill">Analyze Now</a>
+    </div>
+
+    <button class="mobile-toggle" aria-label="Toggle Menu">
+      <div class="line"></div>
+      <div class="line"></div>
+    </button>
+  </div>
+  
+  <div class="mobile-menu">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/recipes">Recipes</a>
+    <a href="/analyze" class="mobile-cta">Analyze Now</a>
+  </div>
 </nav>
 
 <style>
-	.navbar { background: white; border-bottom: 1px solid #eee; padding: 1rem 0; }
-	.container { 
-		max-width: 1000px; margin: 0 auto; padding: 0 1rem;
-		display: flex; justify-content: space-between; align-items: center;
-	}
-	.logo { font-weight: 800; font-size: 1.5rem; text-decoration: none; color: var(--brand); }
-	.links a { margin-left: 1.5rem; text-decoration: none; color: #555; font-weight: 500; }
-	.links a:hover { color: var(--brand); }
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px); /* The "Glass" effect */
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    color: var(--brand-dark);
+    display: flex;
+    align-items: center;
+  }
+
+  .logo .paw { margin-left: 0.5rem; font-size: 1.2rem; }
+
+  /* Desktop Styles */
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
+
+  .nav-item {
+    text-decoration: none;
+    color: var(--brand-dark);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  .nav-item:hover { opacity: 1; }
+
+  .cta-pill {
+    background: var(--brand-dark);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 100px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+
+  .cta-pill:hover {
+    background: var(--brand-accent);
+    transform: translateY(-2px);
+  }
+
+  /* Mobile Styles */
+  .mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+  }
+
+  .mobile-toggle .line {
+    width: 24px;
+    height: 2px;
+    background: var(--brand-dark);
+    transition: 0.3s;
+  }
+
+  .mobile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    padding: 2rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .mobile-toggle { display: flex; }
+    .mobile-menu.active { display: flex; }
+    
+    .mobile-menu a {
+      text-decoration: none;
+      color: var(--brand-dark);
+      font-size: 1.5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      text-transform: uppercase;
+    }
+
+    .mobile-cta {
+      background: var(--brand-accent);
+      color: white !important;
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+  }
 </style>
+
+<script>
+  const toggle = document.querySelector('.mobile-toggle');
+  const menu = document.querySelector('.mobile-menu');
+
+  toggle?.addEventListener('click', () => {
+    menu?.classList.toggle('active');
+  });
+</script>

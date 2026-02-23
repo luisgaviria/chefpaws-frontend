@@ -114,10 +114,47 @@ import { ClientRouter } from 'astro:transitions';
   .btn-minimal { margin-top: 4rem; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; opacity: 0.3; transition: 0.3s; border: none; background: none; width: 100%; text-align: center; }
   .btn-minimal:hover { opacity: 1; color: var(--brand-accent); }
 
-  @media (max-width: 768px) {
-    .view { padding: 3rem 1.5rem; }
-    .input-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+/* 1. Reset the frame for mobile */
+@media (max-width: 768px) {
+  nutrition-calculator {
+    padding: 2rem 0.5rem; /* Reduce outer squeezing */
   }
+
+  .calculator-frame {
+    margin: 0; 
+    width: 100%;
+    border-radius: 24px; /* Tighter radius for mobile edges */
+  }
+
+  /* Target the view specifically to kill the 5rem padding */
+  nutrition-calculator .view { 
+    padding: 3rem 1.5rem !important; 
+  }
+
+  .title-display {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    line-height: 1.1;
+  }
+  
+ /* 1. Force the grid to a single column */
+ .input-grid { 
+    grid-template-columns: 1fr !important; 
+    gap: 1.25rem; 
+  }
+
+  /* 2. Force the "Special Requirements" textarea to drop the span-2 behavior */
+  .field {
+    grid-column: span 1 !important;
+  }
+
+  /* 3. Ensure the pill button stretches to the edges */
+  .pill-action-trigger {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+
+}
 </style>
 
 <nutrition-calculator data-api-url={import.meta.env.PUBLIC_API_URL || 'http://localhost:8080'}>
