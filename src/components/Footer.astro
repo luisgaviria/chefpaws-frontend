@@ -2,12 +2,136 @@
 const year = new Date().getFullYear();
 ---
 <footer class="footer">
-	<p>&copy; {year} ChefPaws. Built for healthy dogs in Boston & Medellín.</p>
+  <div class="footer-wrapper">
+    <div class="footer-column brand">
+      <span class="logo">ChefPaws<span class="accent">.</span></span>
+      <p class="tagline">Boutique Raw Nutrition</p>
+    </div>
+
+    <div class="footer-column market">
+      <span class="region-label">Florida Fresh</span>
+      <p class="cities">Miami • FTL • Palm Beach</p>
+    </div>
+
+    <div class="footer-column meta">
+      <div class="legal-stack">
+        <a href="/privacy" class="footer-link">Privacy</a>
+        <span class="sep">/</span>
+        <a href="/terms" class="footer-link">Terms</a>
+      </div>
+      <p class="copyright">&copy; {year} ChefPaws. Locally Prepped.</p>
+    </div>
+  </div>
 </footer>
 
 <style>
-	.footer { 
-		text-align: center; padding: 2rem; 
-		background: #222; color: #888; font-size: 0.9rem;
-	}
+  .footer { 
+    background: #ffffff; 
+    padding: 60px 24px; /* Reduced vertical padding by 50% */
+    border-top: 1px solid #f2f2f2;
+    color: #1a1a1a;
+  }
+
+  .footer-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between; /* Spreads the three columns across the width */
+    align-items: center;
+  }
+
+  .footer-column {
+    flex: 1;
+  }
+
+  /* Left: Branding */
+  .brand {
+    text-align: left;
+  }
+
+  .logo {
+    font-size: 1.4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+  }
+
+  .accent {
+    color: #ff4d4d; 
+  }
+
+  .tagline {
+    font-size: 0.65rem;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    font-weight: 800;
+    margin-top: 4px;
+  }
+
+  /* Center: Market Focus */
+  .market {
+    text-align: center;
+  }
+
+  .region-label {
+    font-size: 0.6rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #ff4d4d;
+    letter-spacing: 0.2em;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .cities {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    letter-spacing: 0.02em;
+  }
+
+  /* Right: Meta */
+  .meta {
+    text-align: right;
+  }
+
+  .legal-stack {
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .sep {
+    color: #eee;
+    margin: 0 8px;
+  }
+
+  .footer-link {
+    color: #bbb;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+  }
+
+  .footer-link:hover {
+    color: #ff4d4d;
+  }
+
+  .copyright {
+    font-size: 0.7rem;
+    color: #ccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 900px) {
+    .footer-wrapper {
+      flex-direction: column;
+      gap: 40px;
+      text-align: center;
+    }
+    .brand, .market, .meta { text-align: center; }
+  }
 </style>

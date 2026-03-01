@@ -1,37 +1,56 @@
 ---
 import Layout from '../Layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
-import FeaturesGrid from '../components/Features.astro'; // Assuming this is your grid component
+import FeaturesGrid from '../components/Features.astro';
+import TrustBar from '../components/TrustBar.svelte'; 
+import VisualTeardown from '../components/VisualTeardown.svelte';
+import ComparisonTable from '../components/ComparisonTable.svelte';
+// 1. Import the Final CTA component
+import FinalCTA from '../components/FinalCTA.svelte';
 import type { HomepageResponse, Section } from '../types/drupal';
 
-// 1. Fetch the dynamic data from your Go Logic Engine
-// This looks for the Railway variable first, falling back to local for your dev work
 const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
-const response = await fetch(`${API_URL}/homepage`);
+
+const response = await fetch(`${API_URL}/page?slug=/`);
+
+if (!response.ok) {
+  const errorText = await response.text();
+  throw new Error(`Backend Error: ${errorText}`);
+}
+
 const data: HomepageResponse = await response.json();
 
-// 2. Map the Drupal Paragraph Types to your Astro Components
-// We use 'as const' and keyof to keep TypeScript happy on your MacBook Pro
+// 2. Register the machine names for all 6 components
 const COMPONENTS = {
   'paragraph--hero': Hero,
   'paragraph--features_grid': FeaturesGrid,
+  'paragraph--trust_bar': TrustBar,
+  'paragraph--visual_teardown': VisualTeardown, 
+  'paragraph--comparison_table': ComparisonTable,
+  'paragraph--cta': FinalCTA,
 } as const;
 
 type ComponentKey = keyof typeof COMPONENTS;
 ---
 
 <Layout title={data.title}>
-  {data.sections.map((section: Section) => {
-    // 3. Dynamic component selection
-    const Component = COMPONENTS[section.type as ComponentKey];
+  {data.sections && data.sections.map((section: Section) => {
+    // Handle Interactive Svelte Components (client:load required for inputs/hotspots)
+    if (section.type === 'paragraph--visual_teardown') {
+      return <VisualTeardown {...(section.content as any)} client:load />;
+    }
     
-    // 4. Render if the component exists, passing the content as props
-    return Component ? <Component {...(section.content as any)} /> : null;
+    if (section.type === 'paragraph--trust_bar') {
+      return <TrustBar {...(section.content as any)} client:load />;
+    }
+
+    // 3. New interactive logic for the CTA (client:load required for the weight input)
+    if (section.type === 'paragraph--final_cta') {
+      return <FinalCTA {...(section.content as any)} client:load />;
+    }
+
+    // Handle Static Components via the Map
+    const StaticComponent = COMPONENTS[section.type as ComponentKey];
+    return StaticComponent ? <StaticComponent {...(section.content as any)} /> : null;
   })}
-  
-  {/* You can still keep your static CTA here if it's not in Drupal yet */}
-  <section class="cta-banner">
-    <h2>Ready to see the math for Alfonzo?</h2>
-    <a href="/dashboard" class="btn-primary">View Current Clients</a>
-  </section>
 </Layout>
