@@ -36,8 +36,8 @@ const {
 <style>
   .features-section {
     background: #ffffff;
-    padding: clamp(5rem, 10vw, 9rem) 1.5rem;
-    text-align: center;
+    /* Using clamp for fluid vertical spacing */
+    padding: clamp(4rem, 8vw, 9rem) 1.5rem;
   }
 
   .container {
@@ -47,22 +47,28 @@ const {
 
   /* --- Header --- */
   .section-header {
-    margin-bottom: clamp(4rem, 8vw, 6rem);
+    margin-bottom: clamp(3rem, 6vw, 6rem);
+    text-align: center; /* Desktop Default */
   }
 
   .title {
-    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    /* Fluid typography that won't overwhelm mobile screens */
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 800;
     letter-spacing: -0.04em;
     color: #111;
     line-height: 1.1;
     margin-bottom: 1rem;
+    /* Prevents single words from hanging on mobile */
+    text-wrap: balance;
   }
 
   .subtitle {
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
     color: #888;
     font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   /* --- Grid --- */
@@ -76,33 +82,33 @@ const {
   .feature-card {
     position: relative;
     background: #fcfcfc;
-    padding: 4rem 2rem;
+    padding: clamp(2.5rem, 4vw, 4rem) 2rem;
     border-radius: 20px;
     border: 1px solid #f0f0f0;
     transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-align: center;
     min-height: 320px;
   }
 
   .card-title {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: #111;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
   }
 
   .card-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.6;
     color: #666;
     margin: 0 auto;
-    max-width: 260px;
+    max-width: 280px;
   }
 
-  /* A single, static accent detail */
   .card-base-line {
     position: absolute;
     bottom: 0;
@@ -114,25 +120,59 @@ const {
     transition: width 0.4s ease;
   }
 
-  /* --- Interactions --- */
-  .feature-card:hover {
-    background: #ffffff;
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
-    border-color: #eee;
+  /* --- Interactions (Desktop Only) --- */
+  @media (hover: hover) {
+    .feature-card:hover {
+      background: #ffffff;
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+      border-color: #eee;
+    }
+
+    .feature-card:hover .card-base-line {
+      width: 40px;
+    }
   }
 
-  .feature-card:hover .card-base-line {
-    width: 40px; /* Only detail that moves, very subtly */
+  /* --- Responsive Breakpoints --- */
+  @media (max-width: 1024px) {
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
-  /* --- Responsive --- */
-  @media (max-width: 900px) {
-    .features-grid { grid-template-columns: 1fr 1fr; }
-  }
+  @media (max-width: 640px) {
+    .section-header {
+      /* Senior touch: Left alignment on mobile feels more natural for reading */
+      text-align: left;
+    }
 
-  @media (max-width: 600px) {
-    .features-grid { grid-template-columns: 1fr; }
-    .feature-card { min-height: auto; padding: 3rem 1.5rem; }
+    .subtitle {
+      margin: 0;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .feature-card {
+      min-height: auto;
+      padding: 2.5rem 1.5rem;
+      text-align: left; /* Match the header alignment */
+      align-items: flex-start;
+    }
+
+    .card-text {
+      margin: 0;
+      max-width: 100%;
+    }
+
+    .card-base-line {
+      left: 1.5rem;
+      transform: none;
+      /* On mobile, we keep the accent static since there's no hover */
+      width: 30px; 
+    }
   }
 </style>
