@@ -264,20 +264,31 @@ import { ClientRouter } from 'astro:transitions';
     }
 
     async submitLead() {
-      const payload = { 
-        name: this.querySelector('#userName').value, 
-        email: this.querySelector('#userEmail').value,
-        dogName: this.querySelector('#dogName').value,
-        selectedPlan: this.selectedPlan,
-        selectedRecipes: Array.from(this.selectedRecipes)
+      const selectedPortions = (this.calcData?.recipes || [])
+        .filter(r => this.selectedRecipes.has(r.recipeName))
+        .map(r => r.portionGrams);
+      const avgPortion = selectedPortions.length
+        ? selectedPortions.reduce((a, b) => a + b, 0) / selectedPortions.length
+        : 0;
+
+      const payload = {
+        ownerName:            this.querySelector('#userName').value,
+        email:                this.querySelector('#userEmail').value,
+        phone:                this.querySelector('#userPhone').value,
+        zip:                  this.querySelector('#userZip').value,
+        dogName:              this.querySelector('#dogName').value,
+        dailyCalories:        this.calcData?.dailyCalories ?? 0,
+        portionGrams:         avgPortion,
+        specialRequirements:  this.querySelector('#userMessage').value,
+        source:               'ChefPaws Calculator',
       };
-      
-      await fetch(`${this.apiUrl}/api/lead`, { 
-        method: 'POST', 
-        headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify(payload)
+
+      await fetch(`${this.apiUrl}/api/lead`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
-      
+
       this.querySelector('#lead-form-container').classList.add('hidden');
       this.querySelector('#success-message').classList.remove('hidden');
     }
