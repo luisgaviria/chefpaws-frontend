@@ -8,13 +8,21 @@ import { ClientRouter } from 'astro:transitions';
 <style is:global>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
   
-
+  :root {
+    --brand-dark: #1a1a1a;
+    --brand-accent: #ff6b6b;
+    --brand-soft: #f4f4f2;
+    --brand-surface: #ffffff;
+    --text-muted: #666;
+    --shadow-soft: 0 20px 40px rgba(0,0,0,0.05);
+    --border-light: #eee;
+  }
 
   nutrition-calculator { 
     font-family: 'Plus Jakarta Sans', sans-serif; 
     display: block; 
     background-color: var(--brand-soft); 
-    padding: 4rem 1rem; 
+    padding: clamp(1rem, 5vw, 4rem) 1rem; 
     min-height: 100vh; 
   }
 
@@ -22,12 +30,12 @@ import { ClientRouter } from 'astro:transitions';
     background: var(--brand-surface); 
     max-width: 1100px; 
     margin: 0 auto; 
-    border-radius: 48px; 
+    border-radius: clamp(24px, 5vw, 48px); 
     box-shadow: var(--shadow-soft); 
     overflow: hidden; 
   }
   
-  .view { padding: 5rem; display: none; }
+  .view { padding: clamp(2rem, 8vw, 5rem); display: none; }
   .view.active { display: block; animation: smoothReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
   
   @keyframes smoothReveal { 
@@ -35,118 +43,58 @@ import { ClientRouter } from 'astro:transitions';
     to { opacity: 1; transform: translateY(0); } 
   }
 
-  .title-display { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 10vw, 7rem); line-height: 0.85; margin-bottom: 2.5rem; text-transform: uppercase; letter-spacing: -0.02em; }
-  .eyebrow-accent { font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--brand-accent); margin-bottom: 1.5rem; display: block; }
+  .title-display { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 8vw, 7rem); line-height: 0.9; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: -0.02em; }
+  .eyebrow-accent { font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--brand-accent); margin-bottom: 1rem; display: block; }
   
-  .metric-hero-modern { background: var(--brand-dark); color: white; padding: 5rem 2rem; border-radius: 40px; margin-bottom: 5rem; text-align: center; }
-  .hero-value-polished { font-family: 'Bebas Neue', sans-serif; font-size: clamp(6rem, 18vw, 12rem); line-height: 0.8; display: flex; justify-content: center; align-items: baseline; }
-  .hero-value-polished .unit { font-family: 'Plus Jakarta Sans'; font-size: 1.1rem; font-weight: 800; opacity: 0.4; margin-left: 1.5rem; letter-spacing: 0.1em; }
+  .metric-hero-modern { background: var(--brand-dark); color: white; padding: clamp(2rem, 5vw, 5rem) 1.5rem; border-radius: clamp(20px, 4vw, 40px); margin-bottom: 3rem; text-align: center; }
+  .hero-value-polished { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 15vw, 12rem); line-height: 0.8; display: flex; justify-content: center; align-items: baseline; }
+  .hero-value-polished .unit { font-family: 'Plus Jakarta Sans'; font-size: 0.9rem; font-weight: 800; opacity: 0.4; margin-left: 1rem; letter-spacing: 0.1em; }
 
-  .selection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; width: 100%; }
+  .selection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1.5rem; width: 100%; }
   
   .glass-card-modern { 
     background: white; 
     border: 1.5px solid var(--border-light); 
-    border-radius: 40px; 
-    padding: 4rem 3rem; 
+    border-radius: clamp(24px, 4vw, 40px); 
+    padding: clamp(2rem, 5vw, 4rem) 2rem; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     text-align: center;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
     cursor: pointer;
-  }
-
-  .glass-card-modern:hover { transform: translateY(-10px); border-color: var(--brand-dark); }
-  .glass-card-modern.selected { border-color: var(--brand-accent); background-color: #fff9f9; transform: scale(1.02); }
-
-  .plan-count { font-family: 'Bebas Neue', sans-serif; font-size: 7rem; line-height: 1; color: var(--brand-dark); margin-bottom: 0.5rem; }
-  .plan-count span { font-size: 1.2rem; color: var(--brand-accent); vertical-align: super; text-transform: uppercase; font-weight: 800; }
-  .card-label { font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
-  .card-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 3rem; flex-grow: 1; }
-
-  .pill-action-trigger {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: var(--brand-dark) !important;
-    color: #ffffff !important;
-    height: 60px !important;
-    width: 100% !important;
-    max-width: 400px !important;
-    margin: 0 auto !important;
-    border-radius: 100px !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 800 !important;
-    font-size: 0.85rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
-    cursor: pointer !important;
-    transition: all 0.4s ease !important;
-    border: none !important;
-    text-decoration: none !important;
-  }
-  
-  .pill-action-trigger:hover { background-color: var(--brand-accent) !important; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 107, 107, 0.2); }
-  .pill-action-trigger.disabled { opacity: 0.15; pointer-events: none; }
-
-  .unit-g { text-transform: lowercase !important; font-family: 'Plus Jakarta Sans', sans-serif !important; font-size: 0.9rem; font-weight: 800; color: var(--brand-dark); margin-left: 1px; }
-
-  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 4rem; }
-  .field { display: flex; flex-direction: column; background: #f9f9f7; padding: 1.5rem 2rem; border-radius: 20px; transition: 0.3s; text-align: left; }
-  .field:focus-within { background: white; box-shadow: 0 0 0 2px var(--brand-dark); }
-  .field label { font-weight: 800; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.5rem; }
-  
-  input, textarea { background: transparent; border: none; outline: none; font-family: inherit; font-size: 1.25rem; font-weight: 700; color: var(--brand-dark); width: 100%; }
-
-  .hidden { display: none !important; }
-  .success-state { text-align: center; padding: 4rem 0; animation: fadeUp 0.6s ease; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-  .btn-minimal { margin-top: 4rem; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; opacity: 0.3; transition: 0.3s; border: none; background: none; width: 100%; text-align: center; }
-  .btn-minimal:hover { opacity: 1; color: var(--brand-accent); }
-
-/* 1. Reset the frame for mobile */
-@media (max-width: 768px) {
-  nutrition-calculator {
-    padding: 2rem 0.5rem; /* Reduce outer squeezing */
-  }
-
-  .calculator-frame {
-    margin: 0; 
     width: 100%;
-    border-radius: 24px; /* Tighter radius for mobile edges */
   }
 
-  /* Target the view specifically to kill the 5rem padding */
-  nutrition-calculator .view { 
-    padding: 3rem 1.5rem !important; 
-  }
+  .glass-card-modern:hover { transform: translateY(-8px); border-color: var(--brand-dark); }
+  .glass-card-modern.selected { border-color: var(--brand-accent); background-color: #fff9f9; }
 
-  .title-display {
-    font-size: clamp(2.5rem, 12vw, 4rem);
-    line-height: 1.1;
+  .plan-count { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 10vw, 7rem); line-height: 1; color: var(--brand-dark); margin-bottom: 0.5rem; }
+  .plan-count span { font-size: 1rem; color: var(--brand-accent); vertical-align: super; text-transform: uppercase; font-weight: 800; }
+  .card-label { font-weight: 800; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+  .card-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; flex-grow: 1; }
+
+  .pill-action-trigger {
+    display: flex; align-items: center; justify-content: center;
+    background-color: var(--brand-dark); color: #ffffff;
+    min-height: 60px; width: 100%; max-width: 320px;
+    margin: 0 auto; border-radius: 100px;
+    font-weight: 800; font-size: 0.8rem; text-transform: uppercase;
+    letter-spacing: 0.1em; cursor: pointer; transition: 0.3s; border: none;
   }
   
- /* 1. Force the grid to a single column */
- .input-grid { 
-    grid-template-columns: 1fr !important; 
-    gap: 1.25rem; 
-  }
+  .pill-action-trigger:hover { background-color: var(--brand-accent); transform: translateY(-2px); }
+  .pill-action-trigger.disabled { opacity: 0.2; pointer-events: none; }
 
-  /* 2. Force the "Special Requirements" textarea to drop the span-2 behavior */
-  .field {
-    grid-column: span 1 !important;
-  }
+  .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+  .field { display: flex; flex-direction: column; background: #f9f9f7; padding: 1.25rem 1.5rem; border-radius: 20px; text-align: left; }
+  .field label { font-weight: 800; font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+  input, textarea { background: transparent; border: none; outline: none; font-family: inherit; font-size: 1.1rem; font-weight: 700; color: var(--brand-dark); width: 100%; }
 
-  /* 3. Ensure the pill button stretches to the edges */
-  .pill-action-trigger {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-
-}
+  .btn-minimal { margin-top: 3rem; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; opacity: 0.4; transition: 0.3s; border: none; background: none; width: 100%; }
+  .btn-minimal:hover { opacity: 1; color: var(--brand-accent); }
+  
+  .hidden { display: none !important; }
 </style>
 
 <nutrition-calculator data-api-url={import.meta.env.PUBLIC_API_URL || 'http://localhost:8080'}>
@@ -154,12 +102,12 @@ import { ClientRouter } from 'astro:transitions';
     <div id="phase-1" class="view active">
       <span class="eyebrow-accent">Phase 01: Biological Input</span>
       <h2 class="title-display">Analyze Your Dog</h2>
-      <div class="input-grid" style="grid-template-columns: 1fr;">
+      <div class="input-grid">
         <div class="field"><label>Dog's Name</label><input type="text" id="dogName" placeholder="e.g. Tony" required /></div>
         <div class="field"><label>Weight (lbs)</label><input type="number" id="weight" placeholder="00" required /></div>
         <div class="field">
-          <label>Activity Level</label>
-          <input type="range" id="activity" min="1" max="5" step="1" value="3" style="cursor:pointer; margin-top:1rem;" />
+          <label>Activity Level (1-5)</label>
+          <input type="range" id="activity" min="1" max="5" step="1" value="3" />
         </div>
       </div>
       <div class="pill-action-trigger" id="calc-btn"><span>Analyze Biology</span></div>
@@ -169,13 +117,27 @@ import { ClientRouter } from 'astro:transitions';
       <span class="eyebrow-accent">Phase 02: Frequency</span>
       <h2 class="title-display">Select Duration</h2>
       <div class="metric-hero-modern">
-        <span class="metric-label" style="text-transform:uppercase; font-size:0.7rem; letter-spacing:0.3em; opacity:0.4; display:block; margin-bottom:1rem;">Daily Energy Target</span>
         <div class="hero-value-polished"><span id="res-cals"></span><span class="unit">KCAL / DAY</span></div>
       </div>
       <div class="selection-grid">
-        <div class="glass-card-modern select-plan-btn" data-plan="5"><div class="plan-count">5 <span>Days</span></div><div class="card-label">The Taster</div><p class="card-desc">Perfect for testing the raw transition for <span class="dog-name-insert"></span>.</p><div class="pill-action-trigger"><span>Select</span></div></div>
-        <div class="glass-card-modern select-plan-btn" data-plan="10"><div class="plan-count">10 <span>Days</span></div><div class="card-label">The Standard</div><p class="card-desc">The most popular choice for long-term health.</p><div class="pill-action-trigger"><span>Select</span></div></div>
-        <div class="glass-card-modern select-plan-btn" data-plan="20"><div class="plan-count">20 <span>Days</span></div><div class="card-label">The Pro</div><p class="card-desc">Ideal for high-performance and multi-pet homes.</p><div class="pill-action-trigger"><span>Select</span></div></div>
+        <div class="glass-card-modern select-plan-btn" data-plan="5">
+          <div class="plan-count">5 <span>Days</span></div>
+          <div class="card-label">The Taster</div>
+          <p class="card-desc">Perfect for testing the transition.</p>
+          <div class="pill-action-trigger"><span>Select</span></div>
+        </div>
+        <div class="glass-card-modern select-plan-btn" data-plan="10">
+          <div class="plan-count">10 <span>Days</span></div>
+          <div class="card-label">The Standard</div>
+          <p class="card-desc">Most popular for long-term health.</p>
+          <div class="pill-action-trigger"><span>Select</span></div>
+        </div>
+        <div class="glass-card-modern select-plan-btn" data-plan="20">
+          <div class="plan-count">20 <span>Days</span></div>
+          <div class="card-label">The Pro</div>
+          <p class="card-desc">Ideal for high-performance homes.</p>
+          <div class="pill-action-trigger"><span>Select</span></div>
+        </div>
       </div>
       <button class="btn-minimal" id="reset-to-phase-1">Reset Analysis</button>
     </div>
@@ -183,9 +145,8 @@ import { ClientRouter } from 'astro:transitions';
     <div id="phase-3" class="view">
         <span class="eyebrow-accent">Phase 03: Formulations</span>
         <h2 class="title-display">Craft the Box</h2>
-        <p style="margin-bottom: 4rem; color: var(--text-muted); font-weight: 500;">Select one or more recipes to include in <span id="res-name-3" style="color:var(--brand-dark); font-weight: 800;"></span>'s rotation.</p>
         <div id="recipe-list" class="selection-grid"></div>
-        <div style="text-align: center; margin-top: 5rem;">
+        <div style="text-align: center; margin-top: 4rem;">
             <div class="pill-action-trigger disabled" id="confirm-menu-btn"><span>Confirm Selection</span></div>
             <button class="btn-minimal" id="back-to-plans">Adjust Duration</button>
         </div>
@@ -201,16 +162,14 @@ import { ClientRouter } from 'astro:transitions';
               <div class="field"><label>Email Address</label><input type="email" id="userEmail" required /></div>
               <div class="field"><label>Phone Number</label><input type="tel" id="userPhone" required /></div>
               <div class="field"><label>Zip Code</label><input type="text" id="userZip" required /></div>
-              <div class="field" style="grid-column: span 2;"><label>Special Requirements</label><textarea id="userMessage" placeholder="Allergies, delivery notes..."></textarea></div>
+              <div class="field" style="grid-column: 1 / -1;"><label>Special Requirements</label><textarea id="userMessage" rows="3"></textarea></div>
             </div>
             <div class="pill-action-trigger" id="submit-lead-btn"><span>Request Roadmap</span></div>
           </form>
       </div>
-
-      <div id="success-message" class="hidden success-state">
-          <h2 class="title-display" style="font-size: 4rem;">Blueprint Sent</h2>
-          <p style="font-weight: 600; color: var(--brand-dark);">Your analysis is being processed. We will contact you at the number provided to finalize your custom formulation.</p>
-          <button class="btn-minimal" onclick="location.reload()">Start New Analysis</button>
+      <div id="success-message" class="hidden" style="text-align:center;">
+          <h2 class="title-display">Blueprint Sent</h2>
+          <button class="btn-minimal" onclick="location.reload()">Start New</button>
       </div>
     </div>
   </div>
@@ -220,124 +179,107 @@ import { ClientRouter } from 'astro:transitions';
   class NutritionCalculator extends HTMLElement {
     constructor() {
       super();
-      // Get the API URL from the data attribute set in Astro
       this.apiUrl = this.getAttribute('data-api-url');
-      
-      this.btn = this.querySelector('#calc-btn');
-      this.leadSubmitBtn = this.querySelector('#submit-lead-btn');
-      this.confirmMenuBtn = this.querySelector('#confirm-menu-btn');
-      this.backBtn = this.querySelector('#back-to-plans');
-      this.resetBtn = this.querySelector('#reset-to-phase-1');
-      
-      this.calcData = null;
-      this.selectedPlan = null;
       this.selectedRecipes = new Set();
+      this.selectedPlan = null;
+      this.calcData = null;
 
-      this.btn?.addEventListener('click', () => this.runEngine());
+      // Selectors
+      this.calcBtn = this.querySelector('#calc-btn');
+      this.confirmBtn = this.querySelector('#confirm-menu-btn');
+      this.leadBtn = this.querySelector('#submit-lead-btn');
+
+      // Bindings
+      this.calcBtn.addEventListener('click', () => this.runEngine());
       this.querySelectorAll('.select-plan-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           this.selectedPlan = e.currentTarget.dataset.plan;
           this.transition('phase-2', 'phase-3');
         });
       });
-      this.confirmMenuBtn?.addEventListener('click', () => {
-        if (this.selectedRecipes.size > 0) this.transition('phase-3', 'phase-4');
-      });
-      this.backBtn?.addEventListener('click', () => this.transition('phase-3', 'phase-2'));
-      this.resetBtn?.addEventListener('click', () => this.transition('phase-2', 'phase-1'));
-      this.leadSubmitBtn?.addEventListener('click', () => this.submitLead());
+      
+      this.confirmBtn.addEventListener('click', () => this.transition('phase-3', 'phase-4'));
+      this.querySelector('#back-to-plans').addEventListener('click', () => this.transition('phase-3', 'phase-2'));
+      this.querySelector('#reset-to-phase-1').addEventListener('click', () => this.transition('phase-2', 'phase-1'));
+      this.leadBtn.addEventListener('click', () => this.submitLead());
     }
 
     async runEngine() {
-      const dogName = this.querySelector('#dogName').value;
-      const weightLbs = this.querySelector('#weight').value;
-      const activity = this.querySelector('#activity').value;
-      if (!dogName || !weightLbs) return alert("Please fill out Name and Weight");
+      const name = this.querySelector('#dogName').value;
+      const weight = this.querySelector('#weight').value;
+      if(!name || !weight) return alert("Fill Name and Weight");
       
-      this.btn.querySelector('span').textContent = 'Analyzing...';
-      try {
-        const response = await fetch(`${this.apiUrl}/api/calculate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: dogName, weightKG: parseFloat(weightLbs) / 2.20462, activityLevel: parseInt(activity) })
-        });
-        this.calcData = await response.json();
-        this.querySelector('#res-cals').textContent = Math.round(this.calcData.dailyCalories);
-        this.querySelector('#res-name-3').textContent = dogName;
-        this.querySelectorAll('.dog-name-insert').forEach(el => el.textContent = dogName);
-        this.transition('phase-1', 'phase-2', () => {
-            this.btn.querySelector('span').textContent = 'Analyze Biology';
-            this.renderRecipes();
-        });
-      } catch (err) { 
-        console.error(err);
-        this.btn.querySelector('span').textContent = 'Analyze Biology';
-      }
+      const res = await fetch(`${this.apiUrl}/api/calculate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name, 
+          weightKG: parseFloat(weight)/2.20462, 
+          activityLevel: parseInt(this.querySelector('#activity').value) 
+        })
+      });
+      this.calcData = await res.json();
+      this.querySelector('#res-cals').textContent = Math.round(this.calcData.dailyCalories);
+      this.renderRecipes();
+      this.transition('phase-1', 'phase-2');
     }
 
     renderRecipes() {
-      const listContainer = this.querySelector('#recipe-list');
-      listContainer.innerHTML = '';
-      this.calcData.recipes.forEach(recipe => {
+      const container = this.querySelector('#recipe-list');
+      container.innerHTML = '';
+      this.calcData.recipes.forEach(r => {
         const card = document.createElement('div');
         card.className = 'glass-card-modern';
         card.innerHTML = `
-          <div class="recipe-name-mini" style="font-family:Bebas Neue; font-size:3.5rem; line-height:0.9; margin-bottom: 1.5rem;">${recipe.recipeName}</div>
-          <p class="card-desc">${recipe.ingredients}</p>
-          <div style="font-weight:800; font-size: 1.4rem; color:var(--brand-dark);">${recipe.portionGrams}<span class="unit-g">g</span></div>
-          <div style="font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.5rem; opacity:0.4;">Daily Prep</div>
+          <div class="card-label">${r.recipeName}</div>
+          <p class="card-desc">${r.ingredients}</p>
+          <div class="plan-count">${r.portionGrams}<span>g</span></div>
         `;
-        
-        card.addEventListener('click', () => {
-          if (this.selectedRecipes.has(recipe.recipeName)) {
-            this.selectedRecipes.delete(recipe.recipeName);
-            card.classList.remove('selected');
-          } else {
-            this.selectedRecipes.add(recipe.recipeName);
-            card.classList.add('selected');
-          }
-          this.confirmMenuBtn.classList.toggle('disabled', this.selectedRecipes.size === 0);
-        });
-        listContainer.appendChild(card);
+        card.onclick = () => {
+          card.classList.toggle('selected');
+          this.selectedRecipes.has(r.recipeName) ? this.selectedRecipes.delete(r.recipeName) : this.selectedRecipes.add(r.recipeName);
+          this.confirmBtn.classList.toggle('disabled', this.selectedRecipes.size === 0);
+        };
+        container.appendChild(card);
       });
     }
 
-    transition(fromId, toId, callback) {
+    transition(from, to) {
       const switchView = () => {
-        this.querySelector(`#${fromId}`).classList.remove('active');
-        this.querySelector(`#${toId}`).classList.add('active');
-        if (callback) callback();
+        this.querySelector(`#${from}`).classList.remove('active');
+        this.querySelector(`#${to}`).classList.add('active');
+        
+        // Ensure the card is focused at the top after change
+        window.scrollTo({
+          top: this.offsetTop - 20,
+          behavior: 'smooth'
+        });
       };
-      if (document.startViewTransition) document.startViewTransition(switchView); else switchView();
+
+      if (document.startViewTransition) {
+        document.startViewTransition(switchView);
+      } else {
+        switchView();
+      }
     }
 
     async submitLead() {
-        this.leadSubmitBtn.querySelector('span').textContent = "Securing Spot...";
-        const payload = {
-            dogName: this.querySelector('#dogName').value,
-            selectedPlan: this.selectedPlan,
-            selectedRecipes: Array.from(this.selectedRecipes),
-            name: this.querySelector('#userName').value,
-            email: this.querySelector('#userEmail').value,
-            phone: this.querySelector('#userPhone').value,
-            zip: this.querySelector('#userZip').value,
-            message: this.querySelector('#userMessage').value,
-            calories: Math.round(this.calcData.dailyCalories)
-        };
-        try {
-            const res = await fetch(`${this.apiUrl}/api/lead`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (res.ok) {
-                this.querySelector('#lead-form-container').classList.add('hidden');
-                this.querySelector('#success-message').classList.remove('hidden');
-            }
-        } catch (e) { 
-            alert("Connection error. Is the Go server running?");
-            this.leadSubmitBtn.querySelector('span').textContent = "Request Roadmap";
-        }
+      const payload = { 
+        name: this.querySelector('#userName').value, 
+        email: this.querySelector('#userEmail').value,
+        dogName: this.querySelector('#dogName').value,
+        selectedPlan: this.selectedPlan,
+        selectedRecipes: Array.from(this.selectedRecipes)
+      };
+      
+      await fetch(`${this.apiUrl}/api/lead`, { 
+        method: 'POST', 
+        headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify(payload)
+      });
+      
+      this.querySelector('#lead-form-container').classList.add('hidden');
+      this.querySelector('#success-message').classList.remove('hidden');
     }
   }
   customElements.define('nutrition-calculator', NutritionCalculator);
