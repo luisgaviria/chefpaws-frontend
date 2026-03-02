@@ -1,0 +1,165 @@
+---
+import type { FeatureItem } from '../types/drupal';
+
+interface Props {
+  steps?: FeatureItem[];
+  field_section_title?: string;
+  field_section_subtitle?: string;
+}
+
+const {
+  steps = [],
+  field_section_title = "How It Works",
+  field_section_subtitle = "Three steps to a dog who eats like they deserve it.",
+} = Astro.props;
+---
+
+<section class="timeline-section">
+  <div class="container">
+
+    <header class="section-header">
+      <p class="eyebrow">The Process</p>
+      <h2 class="section-title">{field_section_title}</h2>
+      <p class="section-subtitle">{field_section_subtitle}</p>
+    </header>
+
+    <ol class="steps-list">
+      {steps.map((step, i) => (
+        <li class="step">
+          <div class="step-rail">
+            <div class="step-num">{String(i + 1).padStart(2, '0')}</div>
+          </div>
+          <div class="step-body">
+            <h3 class="step-headline">{step.field_headline}</h3>
+            <p class="step-description">{step.field_description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+  </div>
+</section>
+
+<style>
+  .timeline-section {
+    background: #fff;
+    padding: clamp(5rem, 10vw, 10rem) clamp(1.25rem, 5vw, 2rem);
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* ── Section header ── */
+  .section-header {
+    text-align: center;
+    margin-bottom: clamp(3.5rem, 7vw, 6rem);
+  }
+
+  .eyebrow {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--brand-accent, #ff6b6b);
+    margin: 0 0 1.25rem;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    color: #111;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+
+  .section-subtitle {
+    font-size: 1.05rem;
+    color: #999;
+    font-weight: 400;
+    line-height: 1.6;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  /* ── Steps list ── */
+  .steps-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ── Single step row ── */
+  .step {
+    display: flex;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    align-items: flex-start;
+  }
+
+  /* Connecting line between steps via the rail column */
+  .step:not(:last-child) .step-rail::after {
+    content: '';
+    display: block;
+    width: 1px;
+    flex: 1;
+    min-height: 2.5rem;
+    background: linear-gradient(to bottom, #e0e0e0 0%, transparent 100%);
+    margin-top: 0.5rem;
+  }
+
+  /* ── Left rail: number + connector ── */
+  .step-rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: stretch;
+    flex-shrink: 0;
+  }
+
+  .step-num {
+    width: clamp(44px, 7vw, 52px);
+    height: clamp(44px, 7vw, 52px);
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+  }
+
+  /* ── Step content ── */
+  .step-body {
+    padding-top: 0.75rem; /* optical align with circle centre */
+    padding-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .step:last-child .step-body {
+    padding-bottom: 0;
+  }
+
+  .step-headline {
+    font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    color: #111;
+    margin: 0 0 0.75rem;
+    text-wrap: balance;
+  }
+
+  .step-description {
+    font-size: 0.96rem;
+    line-height: 1.85;
+    color: #888;
+    margin: 0;
+    max-width: 52ch;
+    text-wrap: pretty;
+  }
+</style>

@@ -91,6 +91,7 @@ import TrustBar from '../components/TrustBar.svelte';
 import VisualTeardown from '../components/VisualTeardown.svelte';
 import ComparisonTable from '../components/ComparisonTable.svelte';
 import FinalCTA from '../components/FinalCTA.svelte';
+import ProcessTimeline from '../components/ProcessTimeline.astro';
 import type { HomepageResponse, Section } from '../types/drupal';
 
 // 1. Capture the slug. [...slug] captures everything after the domain.
@@ -141,6 +142,11 @@ type ComponentKey = keyof typeof COMPONENTS;
       }
       if (section.type === 'paragraph--comparison_table') {
         return <ComparisonTable {...(section.content as any)} client:load />;
+      }
+
+      // ProcessTimeline — explicit mapping because Drupal field name differs from prop name
+      if (section.type === 'paragraph--process_steps') {
+        return <ProcessTimeline steps={(section.content as any).field_process_steps ?? []} />;
       }
 
       // Static Astro Components
