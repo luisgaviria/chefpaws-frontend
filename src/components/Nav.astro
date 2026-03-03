@@ -3,22 +3,44 @@
     <a href="/" class="logo">
       CHEFPAWS <span class="paw">🐾</span>
     </a>
-    
+
     <div class="nav-links">
       <a href="/" class="nav-item">Home</a>
       <a href="/recipes" class="nav-item">Recipes</a>
       <a href="/dashboard" class="cta-pill">Analyze Now</a>
     </div>
 
-    <button class="mobile-toggle" aria-label="Toggle Menu">
-      <div class="line"></div>
-      <div class="line"></div>
-    </button>
+    <div class="nav-controls">
+      <!-- Theme toggle -->
+      <button class="theme-toggle" aria-label="Toggle dark mode">
+        <!-- Moon: shown in light mode -->
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun: shown in dark mode -->
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <!-- Hamburger (mobile only) -->
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <div class="line"></div>
+        <div class="line"></div>
+      </button>
+    </div>
   </div>
-  
+
   <div class="mobile-menu">
     <a href="/">Home</a>
-    <!-- <a href="/dashboard">Dashboard</a> -->
     <a href="/recipes">Recipes</a>
     <a href="/dashboard" class="mobile-cta">Analyze Now</a>
   </div>
@@ -32,11 +54,14 @@
     width: 100%;
     z-index: 1000;
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px); /* The "Glass" effect */
+    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     padding: 1rem 0;
-    transition: all 0.3s ease;
+    transition: background 0.25s ease, border-color 0.25s ease;
+    /* Pull the nav out of the root view-transition snapshot so it
+       doesn't fade when document.startViewTransition() fires */
+    view-transition-name: navbar;
   }
 
   .nav-container {
@@ -56,11 +81,12 @@
     color: var(--brand-dark);
     display: flex;
     align-items: center;
+    transition: color 0.25s ease;
   }
 
   .logo .paw { margin-left: 0.5rem; font-size: 1.2rem; }
 
-  /* Desktop Styles */
+  /* Desktop nav links */
   .nav-links { display: flex; align-items: center; gap: 2rem; }
 
   .nav-item {
@@ -71,7 +97,7 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     opacity: 0.6;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease, color 0.25s ease;
   }
 
   .nav-item:hover { opacity: 1; }
@@ -86,7 +112,7 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    transition: transform 0.3s ease, background 0.3s ease;
+    transition: transform 0.2s ease, background 0.2s ease;
   }
 
   .cta-pill:hover {
@@ -94,7 +120,42 @@
     transform: translateY(-2px);
   }
 
-  /* Mobile Styles */
+  /* ── Controls group (theme toggle + hamburger) ── */
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* ── Theme toggle ── */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-light, #eee);
+    background: transparent;
+    color: var(--brand-dark);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.25s, background 0.2s, transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    background: var(--brand-soft);
+    transform: rotate(15deg);
+  }
+
+  /* Show moon in light mode, sun in dark mode */
+  .icon-sun  { display: none; }
+  .icon-moon { display: block; }
+
+  [data-theme="dark"] .icon-sun  { display: block; }
+  [data-theme="dark"] .icon-moon { display: none; }
+
+  /* ── Hamburger ── */
   .mobile-toggle {
     display: none;
     flex-direction: column;
@@ -109,9 +170,10 @@
     width: 24px;
     height: 2px;
     background: var(--brand-dark);
-    transition: 0.3s;
+    transition: background 0.25s;
   }
 
+  /* ── Mobile menu ── */
   .mobile-menu {
     display: none;
     position: absolute;
@@ -124,19 +186,21 @@
     gap: 1.5rem;
     border-bottom: 1px solid var(--border-light);
     box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    transition: background 0.25s ease;
   }
 
   @media (max-width: 768px) {
-    .nav-links { display: none; }
+    .nav-links    { display: none; }
     .mobile-toggle { display: flex; }
     .mobile-menu.active { display: flex; }
-    
+
     .mobile-menu a {
       text-decoration: none;
       color: var(--brand-dark);
       font-size: 1.5rem;
       font-family: 'Bebas Neue', sans-serif;
       text-transform: uppercase;
+      transition: color 0.25s;
     }
 
     .mobile-cta {
@@ -149,11 +213,44 @@
   }
 </style>
 
-<script>
-  const toggle = document.querySelector('.mobile-toggle');
-  const menu = document.querySelector('.mobile-menu');
+<style is:global>
+  /* view-transition pseudo-elements are always global — cannot be scoped.
+     Disable animation on the navbar layer so it stays put during both the
+     calculator's internal phase transitions and Astro page navigations. */
+  ::view-transition-old(navbar),
+  ::view-transition-new(navbar) {
+    animation: none;
+  }
+</style>
 
-  toggle?.addEventListener('click', () => {
-    menu?.classList.toggle('active');
+<script>
+  function applyTheme(theme: string) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }
+
+  // ── Mobile menu ───────────────────────────────────────────────
+  // Nav persists across View Transitions (transition:persist), so these
+  // listeners are set up once and live for the whole session.
+  const toggle = document.querySelector('.mobile-toggle');
+  const menu   = document.querySelector('.mobile-menu');
+  toggle?.addEventListener('click', () => menu?.classList.toggle('active'));
+
+  // ── Theme toggle ──────────────────────────────────────────────
+  // Set up once. Do NOT re-attach inside astro:page-load — the nav element
+  // persists, so re-running initNav on every navigation stacks duplicate
+  // listeners and makes the toggle fire 2×, 3×, etc.
+  const themeBtn = document.querySelector('.theme-toggle');
+  themeBtn?.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') ?? 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Re-apply theme after every View Transition ────────────────
+  // astro:after-swap fires after the new DOM is swapped in but BEFORE paint,
+  // so re-applying data-theme here avoids any flash on soft navigations.
+  document.addEventListener('astro:after-swap', () => {
+    const stored = localStorage.getItem('theme');
+    if (stored) document.documentElement.setAttribute('data-theme', stored);
   });
 </script>

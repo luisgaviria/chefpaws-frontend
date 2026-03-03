@@ -95,6 +95,70 @@ import { ClientRouter } from 'astro:transitions';
   .btn-minimal:hover { opacity: 1; color: var(--brand-accent); }
   
   .hidden { display: none !important; }
+
+  /* ── Dark mode ──────────────────────────────────────────────── */
+  [data-theme="dark"] nutrition-calculator {
+    background-color: #0f0f0f;
+  }
+
+  [data-theme="dark"] .calculator-frame {
+    background: #141414;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+
+  /* Cards */
+  [data-theme="dark"] .glass-card-modern {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+  }
+  [data-theme="dark"] .glass-card-modern:hover {
+    border-color: #ebebeb;
+  }
+  [data-theme="dark"] .glass-card-modern.selected {
+    background-color: #1f1212;
+    border-color: var(--brand-accent);
+  }
+
+  /* plan-count and headings use var(--brand-dark) which flips light */
+  [data-theme="dark"] .plan-count   { color: #ebebeb; }
+  [data-theme="dark"] .title-display { color: #ebebeb; }
+  [data-theme="dark"] .card-desc    { color: #888; }
+
+  /* Metric hero is intentionally dark — anchor it so it never flips light */
+  [data-theme="dark"] .metric-hero-modern {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+  }
+
+  /* Input fields */
+  [data-theme="dark"] .field {
+    background: #1e1e1e;
+  }
+  [data-theme="dark"] input,
+  [data-theme="dark"] textarea {
+    color: #ebebeb;
+  }
+  [data-theme="dark"] input::placeholder,
+  [data-theme="dark"] textarea::placeholder {
+    color: #555;
+  }
+
+  /* Pill buttons — var(--brand-dark) flips to light, making white text invisible */
+  [data-theme="dark"] .pill-action-trigger {
+    background-color: #ebebeb;
+    color: #111;
+  }
+  [data-theme="dark"] .pill-action-trigger:hover {
+    background-color: var(--brand-accent);
+    color: #fff;
+  }
+  [data-theme="dark"] .pill-action-trigger.disabled {
+    background-color: #2a2a2a;
+    color: #555;
+  }
+
+  [data-theme="dark"] .btn-minimal        { color: #888; }
+  [data-theme="dark"] .btn-minimal:hover  { color: var(--brand-accent); opacity: 1; }
 </style>
 
 <nutrition-calculator data-api-url={import.meta.env.PUBLIC_API_URL || 'http://localhost:8080'}>
