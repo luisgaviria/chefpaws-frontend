@@ -92,6 +92,7 @@ import VisualTeardown from '../components/VisualTeardown.svelte';
 import ComparisonTable from '../components/ComparisonTable.svelte';
 import FinalCTA from '../components/FinalCTA.svelte';
 import ProcessTimeline from '../components/ProcessTimeline.astro';
+import ContactForm from '../components/ContactForm.svelte';
 import type { HomepageResponse, Section } from '../types/drupal';
 
 // 1. Capture the slug. [...slug] captures everything after the domain.
@@ -147,6 +148,9 @@ type ComponentKey = keyof typeof COMPONENTS;
       // ProcessTimeline — explicit mapping because Drupal field name differs from prop name
       if (section.type === 'paragraph--process_steps') {
         return <ProcessTimeline steps={(section.content as any).field_process_steps ?? []} />;
+      }
+      if (section.type === 'paragraph--contact_form') {
+        return <ContactForm {...(section.content as any)} client:load />;
       }
 
       // Static Astro Components
