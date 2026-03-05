@@ -75,7 +75,7 @@
   }
 
   p {
-    color: #666;
+    color: #353535;
     font-size: clamp(16px, 2vw, 19px);
     max-width: 520px;
     margin: 0 auto 48px;

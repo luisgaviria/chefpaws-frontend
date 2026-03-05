@@ -98,7 +98,7 @@
   p {
     font-size: 0.9rem;
     line-height: 1.6;
-    color: #666;
+    color: #373737;
     max-width: 260px;
     margin: 0 auto;
   }
