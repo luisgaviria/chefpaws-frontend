@@ -2,7 +2,7 @@
   export let field_teardown_image: string = "";
   export let field_hotspots: Array<{
     field_label?: string;
-    field_x_coord?: number | string; // Drupal sends coordinates as numbers or strings
+    field_x_coord?: number | string; 
     field_y_coord?: number | string;
   }> = [];
 
@@ -14,8 +14,7 @@
   };
 
   const resolveMedia = (rawMedia: string | undefined) => {
-    if (!rawMedia) return "";
-    return rawMedia;
+    return rawMedia || "";
   };
 </script>
 
@@ -31,15 +30,21 @@
       <img 
         src={resolveMedia(field_teardown_image)} 
         alt="ChefPaws Meal Teardown" 
+        width="1000"
+        height="813"
+        decoding="async"
+        loading="lazy"
         class="bowl-img" 
       />
 
       {#each field_hotspots as hotspot}
-        <div 
+        <button 
+          type="button"
           class="hotspot-group" 
           class:active={activeHotspot === hotspot.field_label}
           style="left: {hotspot.field_x_coord}%; top: {hotspot.field_y_coord}%;"
           on:click={() => toggleHotspot(hotspot.field_label)}
+          aria-label="View {hotspot.field_label}"
         >
           <div class="pulse-ring"></div>
           <div class="dot"></div>
@@ -47,7 +52,7 @@
           <div class="label-card">
             <span class="label-text">{hotspot.field_label}</span>
           </div>
-        </div>
+        </button>
       {/each}
     </div>
   </section>
@@ -85,6 +90,7 @@
   .image-wrapper { 
     position: relative; 
     display: inline-block; 
+    /* This stays at 1000px for that wide, cinematic desktop look */
     max-width: 1000px; 
     width: 100%;
     border-radius: clamp(16px, 4vw, 32px);
@@ -92,12 +98,20 @@
   }
 
   .bowl-img { 
+    /* REMOVED the max-width: 600px that was shrinking it */
     width: 100%; 
+    height: auto;
     display: block; 
     border-radius: clamp(16px, 4vw, 32px); 
+    /* Keeps the image crisp even when scaled up */
+    image-rendering: -webkit-optimize-contrast;
   }
 
   .hotspot-group {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
     position: absolute;
     transform: translate(-50%, -50%);
     cursor: pointer;
@@ -109,7 +123,7 @@
     width: 16px;
     height: 16px;
     background: #fff;
-    border: 4px solid #ff4d4d; /* Use ChefPaws Red for the border */
+    border: 4px solid #ff4d4d; 
     border-radius: 50%;
     position: relative;
     z-index: 2;
@@ -135,7 +149,7 @@
     transform: translateX(-50%) translateY(10px);
     background: #1a1a1a;
     padding: 10px 20px;
-    border-radius: 100px; /* Full pill shape */
+    border-radius: 100px; 
     white-space: nowrap;
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
@@ -143,7 +157,6 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   }
 
-  /* Desktop Hover */
   @media (min-width: 1025px) {
     .hotspot-group:hover .label-card {
       opacity: 1;
@@ -152,7 +165,6 @@
     .hotspot-group:hover { transform: translate(-50%, -50%) scale(1.2); }
   }
 
-  /* Mobile Active State */
   .hotspot-group.active .label-card {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -173,7 +185,7 @@
 
   @media (max-width: 768px) {
     .sub-header { font-size: 0.9rem; }
-    .dot { width: 20px; height: 20px; } /* Larger touch targets for mobile */
+    .dot { width: 20px; height: 20px; } 
     .label-card { 
       bottom: 40px; 
       padding: 8px 16px;
