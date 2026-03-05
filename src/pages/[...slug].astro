@@ -1,4 +1,5 @@
 ---
+import { getImage } from "astro:assets";
 import Layout from '../Layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import FeaturesGrid from '../components/Features.astro';
@@ -19,18 +20,78 @@ if (!response.ok) return Astro.redirect('/404');
 const data: HomepageResponse = await response.json();
 
 /**
- * CLEAN CONTENT MAPPING
- * We pass raw URLs to Svelte components to allow Cloudflare to handle 
- * the optimization at the edge. This prevents the "Double-Optimization" 404s.
+ * RESTORED IMAGE OPTIMIZATION
+ * We process all R2/DDEV images through Astro's Sharp engine.
+ * This ensures Svelte receives a local, optimized /_astro/ URL.
  */
-const sections = data.sections || [];
+const optimizedSections = await Promise.all((data.sections || []).map(async (section: Section) => {
+  
+  // 1. Visual Teardown "Bowl"
+  if (section.type === 'paragraph--visual_teardown' && section.content.field_teardown_image) {
+    try {
+      const optimized = await getImage({
+        src: section.content.field_teardown_image,
+        width: 1000,
+        inferSize: true,
+        quality: 75,
+        format: 'webp'
+      });
+      section.content.field_teardown_image = optimized.src;
+    } catch (e) {
+      console.error("Teardown optimization failed:", e);
+    }
+  }
+
+  // 2. Trust Bar Icons
+  if (section.type === 'paragraph--trust_bar' && section.content.field_trust_items) {
+    section.content.field_trust_items = await Promise.all(
+      section.content.field_trust_items.map(async (item: any) => {
+        if (!item.field_icon) return item;
+        try {
+          const optimizedIcon = await getImage({
+            src: item.field_icon,
+            width: 160,
+            height: 160,
+            quality: 80,
+            format: 'webp'
+          });
+          return { ...item, field_icon: optimizedIcon.src };
+        } catch (e) {
+          return item;
+        }
+      })
+    );
+  }
+
+  // 3. Features Grid
+  if (section.type === 'paragraph--features_grid' && section.content.field_feature_items) {
+    section.content.field_feature_items = await Promise.all(
+      section.content.field_feature_items.map(async (item: any) => {
+        if (!item.field_media) return item;
+        try {
+          const optimized = await getImage({
+            src: item.field_media,
+            width: 600,
+            inferSize: true,
+            quality: 80,
+            format: 'webp'
+          });
+          return { ...item, field_media: optimized.src };
+        } catch (e) {
+          return item;
+        }
+      })
+    );
+  }
+
+  return section;
+}));
 ---
 
 <Layout title={data.title}>
-  {sections.length > 0 ? (
-    sections.map((section: Section) => {
+  {optimizedSections.length > 0 ? (
+    optimizedSections.map((section: Section) => {
       
-      // Svelte: Visual Teardown
       if (section.type === 'paragraph--visual_teardown') {
         return (
           <div class="section-wrapper bowl-wrapper">
@@ -39,7 +100,6 @@ const sections = data.sections || [];
         );
       }
 
-      // Svelte: Trust Bar
       if (section.type === 'paragraph--trust_bar') {
         return (
           <div class="section-wrapper trust-wrapper">
@@ -48,7 +108,6 @@ const sections = data.sections || [];
         );
       }
 
-      // Svelte: Comparison Table
       if (section.type === 'paragraph--comparison_table') {
         return (
           <div class="section-wrapper table-wrapper">
@@ -57,7 +116,6 @@ const sections = data.sections || [];
         );
       }
 
-      // Svelte: Final CTA
       if (section.type === 'paragraph--cta' || section.type === 'paragraph--final_cta') {
         return (
           <div class="section-wrapper cta-wrapper">
@@ -66,47 +124,35 @@ const sections = data.sections || [];
         );
       }
 
-      // Svelte: Contact Form
-      if (section.type === 'paragraph--contact_form') {
-        return <ContactForm {...(section.content as any)} client:load />;
-      }
-
-      // Astro: Process Timeline
       if (section.type === 'paragraph--process_steps') {
         return <ProcessTimeline steps={(section.content as any).field_process_steps ?? []} />;
       }
 
-      // Static Astro Components
-      if (section.type === 'paragraph--hero') {
-        return <Hero {...(section.content as any)} />;
+      if (section.type === 'paragraph--contact_form') {
+        return <ContactForm {...(section.content as any)} client:load />;
       }
 
-      if (section.type === 'paragraph--features_grid') {
-        return <FeaturesGrid {...(section.content as any)} />;
-      }
+      const COMPONENTS = {
+        'paragraph--hero': Hero,
+        'paragraph--features_grid': FeaturesGrid,
+      } as const;
 
-      return null;
+      const StaticComponent = COMPONENTS[section.type as keyof typeof COMPONENTS];
+      return StaticComponent ? <StaticComponent {...(section.content as any)} /> : null;
     })
   ) : (
     <div class="empty-state">
       <h1>No content found</h1>
-      <p>Check the slug and Drupal status.</p>
     </div>
   )}
 </Layout>
 
 <style>
-  /* STOPS THE "JUMPING" 
-     We reserve vertical space for the Svelte components so the page 
-     doesn't "collapse" while the JavaScript is loading.
-  */
   .section-wrapper {
     width: 100%;
-    /* Improves scroll performance by not rendering until near viewport */
     content-visibility: auto; 
     contain-intrinsic-size: 1px 500px;
   }
-
   .bowl-wrapper { min-height: 800px; }
   .trust-wrapper { min-height: 140px; }
   .table-wrapper { min-height: 600px; }
@@ -118,6 +164,5 @@ const sections = data.sections || [];
     align-items: center;
     justify-content: center;
     min-height: 60vh;
-    text-align: center;
   }
 </style>
