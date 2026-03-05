@@ -1,30 +1,14 @@
 <script lang="ts">
+  // Props passed from Drupal/Go via Astro
   export let field_background_style: string = "white"; 
   export let field_trust_items: Array<{
-    field_icon?: string;
+    field_icon?: string; // This will now be a local /_astro/ URL
     field_item_title?: string;
     field_item_description?: string;
   }> = [];
 
-  const resolveMedia = (rawMedia: string | undefined) => {
-    if (!rawMedia) return "";
-
-    // 1. If it's a local DDEV link, return it exactly as is
-    if (rawMedia.includes('ddev.site')) return rawMedia;
-
-    // 2. If it's already an R2 URL (starts with https://pub-...), 
-    // we wrap it for Cloudflare ONLY in production.
-    const isR2 = rawMedia.includes('r2.dev');
-    const isProd = import.meta.env.PROD;
-
-    if (isProd && isR2) {
-      // Direct R2 URL -> Cloudflare Resizer
-      return `https://chefpaws.com/cdn-cgi/image/width=160,height=160,fit=pad,format=auto,quality=85/${rawMedia}`;
-    }
-
-    // 3. Fallback for everything else
-    return rawMedia;
-  };
+  // No more resolveMedia function! 
+  // Astro's [...slug].astro now handles the optimization server-side.
 
   $: itemCount = field_trust_items.length;
 </script>
@@ -37,7 +21,7 @@
           {#if item.field_icon}
             <div class="icon-wrap">
               <img 
-                src={resolveMedia(item.field_icon)} 
+                src={item.field_icon} 
                 alt={item.field_item_title || "Trust Icon"} 
                 width="80"
                 height="80"
@@ -62,10 +46,15 @@
     border-top: 1px solid #f0f0f0;
   }
 
+  /* Support for Drupal background styles */
+  .bg-white { background-color: #ffffff; }
+  .bg-soft { background-color: #f8f8f6; }
+
   .wrapper {
     max-width: 1100px;
     margin: 0 auto;
     display: grid;
+    /* auto-fit makes it responsive without extra media queries */
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 3rem;
   }
@@ -75,6 +64,11 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    transition: transform 0.3s ease;
+  }
+
+  .trust-card:hover {
+    transform: translateY(-5px);
   }
 
   .icon-wrap {
@@ -110,6 +104,10 @@
   }
 
   @media (max-width: 768px) {
-    .wrapper { grid-template-columns: 1fr; gap: 4rem; }
+    .wrapper { 
+      grid-template-columns: 1fr; 
+      gap: 4rem; 
+    }
+    .trust-bar { padding: 4rem 1.5rem; }
   }
 </style>
