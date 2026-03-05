@@ -6,12 +6,13 @@ import node from "@astrojs/node";
 export default defineConfig({
   output: "server",
   build: {
-    inlineStylesheets: "always", // This fixes the "Render Blocking CSS" error
+    // FIX: Resolves "Render Blocking CSS" by putting styles in the HTML <head>
+    inlineStylesheets: "always",
   },
   adapter: node({
     mode: "standalone",
   }),
-  // FIX: Move image configuration to the TOP LEVEL
+  // FIX: Moves image optimization to the top level for Railway + Sharp
   image: {
     service: {
       entrypoint: "astro/assets/services/sharp",
@@ -23,6 +24,20 @@ export default defineConfig({
       },
     ],
     domains: ["pub-cdfac212319d4c7288df0a72323cd4a6.r2.dev"],
+  },
+  // FIX: Resolves "Critical Request Chaining" by bundling tiny Svelte/JS files together
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              return "vendor";
+            }
+          },
+        },
+      },
+    },
   },
   integrations: [svelte()],
 });

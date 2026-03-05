@@ -133,16 +133,16 @@ type ComponentKey = keyof typeof COMPONENTS;
       
       // Svelte Components (Hydrated)
       if (section.type === 'paragraph--visual_teardown') {
-        return <VisualTeardown {...(section.content as any)} client:load />;
+        return <VisualTeardown {...(section.content as any)} client:visible />;
       }
       if (section.type === 'paragraph--trust_bar') {
         return <TrustBar {...(section.content as any)} client:load />;
       }
       if (section.type === 'paragraph--cta' || section.type === 'paragraph--final_cta') {
-        return <FinalCTA {...(section.content as any)} client:load />;
+        return <FinalCTA {...(section.content as any)} client:visible />;
       }
       if (section.type === 'paragraph--comparison_table') {
-        return <ComparisonTable {...(section.content as any)} client:load />;
+        return <ComparisonTable {...(section.content as any)} client:visible />;
       }
 
       // ProcessTimeline — explicit mapping because Drupal field name differs from prop name
