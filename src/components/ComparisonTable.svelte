@@ -184,7 +184,7 @@
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #ff4d4d;
+      color: #ed3333;
       margin-bottom: 1rem;
       padding: 1rem 1.5rem !important;
     }
