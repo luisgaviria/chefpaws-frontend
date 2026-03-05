@@ -68,12 +68,12 @@
 
   .header { margin-bottom: clamp(2rem, 5vw, 4rem); }
   
-  .eyebrow { 
-    color: #f83f3f; 
-    text-transform: uppercase; 
-    font-weight: 900; 
-    font-size: 0.75rem; 
-    letter-spacing: 0.3em; 
+  .eyebrow {
+    color: #c0392b;
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
   }
 
   h2 { 

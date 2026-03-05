@@ -58,7 +58,7 @@
   }
 
   .eyebrow {
-    color: #e53333;
+    color: #c0392b;
     text-transform: uppercase;
     font-weight: 900;
     font-size: 0.75rem;
@@ -99,7 +99,7 @@
     border-bottom: 1px solid #eee;
   }
 
-  .feature-head { color: #696969; width: 30%; }
+  .feature-head { color: #4a4a4a; width: 30%; }
   
   .brand-head { 
     background: #ff4d4d; 
@@ -195,7 +195,7 @@
       font-weight: 900;
       text-transform: uppercase;
       font-size: 0.7rem;
-      color: #696969;
+      color: #4a4a4a;
       letter-spacing: 0.1em;
     }
 
