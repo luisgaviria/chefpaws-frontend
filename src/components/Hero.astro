@@ -17,8 +17,8 @@ const {
 
 /**
  * FIX: Image Optimization
- * We use 1600px as the max-width for a hero. 
- * Astro will generate smaller versions (640px, 1024px) for mobile/tablet automatically.
+ * We dropped the max width to 1280px and quality to 75.
+ * This satisfies Lighthouse's "compression factor" and "larger than displayed" warnings.
  */
 ---
 
@@ -27,11 +27,12 @@ const {
     <Image 
       src={field_media} 
       alt={field_title}
-      width={1600} 
-      height={900}
-      widths={[640, 1024, 1600]}
-      sizes={`(max-width: 768px) 100vw, 1600px`}
-      quality={80}
+      width={1280} 
+      height={720}
+      widths={[400, 800, 1280]}
+      sizes={`(max-width: 768px) 100vw, 1280px`}
+      quality={75}
+      decoding="async"
       loading="eager" 
       fetchpriority="high"
       class="hero-img"
@@ -112,7 +113,6 @@ const {
     z-index: 1;
   }
 
-  /* Updated to target the Astro Image component output */
   .hero-img {
     width: 100%;
     height: 100%;

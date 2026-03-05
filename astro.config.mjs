@@ -1,19 +1,28 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import svelte from "@astrojs/svelte";
-import node from "@astrojs/node"; // 1. Import the adapter
+import node from "@astrojs/node";
 
-// https://astro.build/config
 export default defineConfig({
-  output: "server", // 2. Enable SSR
+  output: "server",
   build: {
-    inlineStylesheets: "always", // This forces Astro to put CSS directly in the HTML
+    inlineStylesheets: "always", // This fixes the "Render Blocking CSS" error
   },
   adapter: node({
-    mode: "standalone", // 3. Configure for Railway/Node environment
-    image: {
-      domains: ["pub-cdfac212319d4c7288df0a72323cd4a6.r2.dev"],
-    },
+    mode: "standalone",
   }),
+  // FIX: Move image configuration to the TOP LEVEL
+  image: {
+    service: {
+      entrypoint: "astro/assets/services/sharp",
+    },
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "pub-cdfac212319d4c7288df0a72323cd4a6.r2.dev",
+      },
+    ],
+    domains: ["pub-cdfac212319d4c7288df0a72323cd4a6.r2.dev"],
+  },
   integrations: [svelte()],
 });
