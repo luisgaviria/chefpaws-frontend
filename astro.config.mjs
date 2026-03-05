@@ -6,6 +6,9 @@ import node from "@astrojs/node"; // 1. Import the adapter
 // https://astro.build/config
 export default defineConfig({
   output: "server", // 2. Enable SSR
+  build: {
+    inlineStylesheets: "always", // This forces Astro to put CSS directly in the HTML
+  },
   adapter: node({
     mode: "standalone", // 3. Configure for Railway/Node environment
     image: {
