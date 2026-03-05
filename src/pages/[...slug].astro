@@ -1,5 +1,4 @@
 ---
-import { getImage } from "astro:assets";
 import Layout from '../Layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import FeaturesGrid from '../components/Features.astro';
@@ -20,102 +19,105 @@ if (!response.ok) return Astro.redirect('/404');
 const data: HomepageResponse = await response.json();
 
 /**
- * REFINED OPTIMIZATION
- * We process images here once. If it fails, we fallback to the original URL.
+ * CLEAN CONTENT MAPPING
+ * We pass raw URLs to Svelte components to allow Cloudflare to handle 
+ * the optimization at the edge. This prevents the "Double-Optimization" 404s.
  */
-const processedSections = await Promise.all((data.sections || []).map(async (section: Section) => {
-  try {
-    // 1. Teardown Bowl Image
-    if (section.type === 'paragraph--visual_teardown' && section.content.field_teardown_image) {
-      const optimized = await getImage({
-        src: section.content.field_teardown_image,
-        width: 1000,
-        inferSize: true,
-        quality: 75
-      });
-      section.content.field_teardown_image = optimized.src;
-    }
-
-    // 2. Trust Bar Icons
-    if (section.type === 'paragraph--trust_bar' && section.content.field_trust_items) {
-      section.content.field_trust_items = await Promise.all(
-        section.content.field_trust_items.map(async (item: any) => {
-          if (!item.field_icon) return item;
-          const optimized = await getImage({
-            src: item.field_icon,
-            width: 160,
-            height: 160,
-            quality: 80
-          });
-          return { ...item, field_icon: optimized.src };
-        })
-      );
-    }
-
-    // 3. Features Grid
-    if (section.type === 'paragraph--features_grid' && section.content.field_feature_items) {
-      section.content.field_feature_items = await Promise.all(
-        section.content.field_feature_items.map(async (item: any) => {
-          if (!item.field_media) return item;
-          const optimized = await getImage({
-            src: item.field_media,
-            width: 600,
-            inferSize: true,
-            quality: 80
-          });
-          return { ...item, field_media: optimized.src };
-        })
-      );
-    }
-  } catch (e) {
-    console.error("Optimization failed for section, using raw URL", e);
-  }
-  return section;
-}));
+const sections = data.sections || [];
 ---
 
 <Layout title={data.title}>
-  {processedSections.map((section: Section) => {
-    // Svelte Components
-    if (section.type === 'paragraph--visual_teardown') {
-      return <div class="wrapper bowl"><VisualTeardown {...(section.content as any)} client:visible /></div>;
-    }
-    if (section.type === 'paragraph--trust_bar') {
-      return <div class="wrapper trust"><TrustBar {...(section.content as any)} client:visible /></div>;
-    }
-    if (section.type === 'paragraph--comparison_table') {
-      return <div class="wrapper table"><ComparisonTable {...(section.content as any)} client:visible /></div>;
-    }
-    if (section.type === 'paragraph--cta' || section.type === 'paragraph--final_cta') {
-      return <div class="wrapper cta"><FinalCTA {...(section.content as any)} client:visible /></div>;
-    }
-    if (section.type === 'paragraph--contact_form') {
-      return <ContactForm {...(section.content as any)} client:load />;
-    }
+  {sections.length > 0 ? (
+    sections.map((section: Section) => {
+      
+      // Svelte: Visual Teardown
+      if (section.type === 'paragraph--visual_teardown') {
+        return (
+          <div class="section-wrapper bowl-wrapper">
+            <VisualTeardown {...(section.content as any)} client:visible />
+          </div>
+        );
+      }
 
-    // Astro Components
-    if (section.type === 'paragraph--process_steps') {
-      return <ProcessTimeline steps={(section.content as any).field_process_steps ?? []} />;
-    }
-    if (section.type === 'paragraph--hero') {
-      return <Hero {...(section.content as any)} />;
-    }
-    if (section.type === 'paragraph--features_grid') {
-      return <FeaturesGrid {...(section.content as any)} />;
-    }
-    
-    return null;
-  })}
+      // Svelte: Trust Bar
+      if (section.type === 'paragraph--trust_bar') {
+        return (
+          <div class="section-wrapper trust-wrapper">
+            <TrustBar {...(section.content as any)} client:visible />
+          </div>
+        );
+      }
+
+      // Svelte: Comparison Table
+      if (section.type === 'paragraph--comparison_table') {
+        return (
+          <div class="section-wrapper table-wrapper">
+            <ComparisonTable {...(section.content as any)} client:visible />
+          </div>
+        );
+      }
+
+      // Svelte: Final CTA
+      if (section.type === 'paragraph--cta' || section.type === 'paragraph--final_cta') {
+        return (
+          <div class="section-wrapper cta-wrapper">
+            <FinalCTA {...(section.content as any)} client:visible />
+          </div>
+        );
+      }
+
+      // Svelte: Contact Form
+      if (section.type === 'paragraph--contact_form') {
+        return <ContactForm {...(section.content as any)} client:load />;
+      }
+
+      // Astro: Process Timeline
+      if (section.type === 'paragraph--process_steps') {
+        return <ProcessTimeline steps={(section.content as any).field_process_steps ?? []} />;
+      }
+
+      // Static Astro Components
+      if (section.type === 'paragraph--hero') {
+        return <Hero {...(section.content as any)} />;
+      }
+
+      if (section.type === 'paragraph--features_grid') {
+        return <FeaturesGrid {...(section.content as any)} />;
+      }
+
+      return null;
+    })
+  ) : (
+    <div class="empty-state">
+      <h1>No content found</h1>
+      <p>Check the slug and Drupal status.</p>
+    </div>
+  )}
 </Layout>
 
 <style>
-  /* Fixes the "Jumping" and "Choppy" feel by reserving space */
-  .wrapper {
+  /* STOPS THE "JUMPING" 
+     We reserve vertical space for the Svelte components so the page 
+     doesn't "collapse" while the JavaScript is loading.
+  */
+  .section-wrapper {
     width: 100%;
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 400px;
+    /* Improves scroll performance by not rendering until near viewport */
+    content-visibility: auto; 
+    contain-intrinsic-size: 1px 500px;
   }
-  .bowl { min-height: 700px; }
-  .trust { min-height: 120px; }
-  .table { min-height: 500px; }
+
+  .bowl-wrapper { min-height: 800px; }
+  .trust-wrapper { min-height: 140px; }
+  .table-wrapper { min-height: 600px; }
+  .cta-wrapper   { min-height: 400px; }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+  }
 </style>
