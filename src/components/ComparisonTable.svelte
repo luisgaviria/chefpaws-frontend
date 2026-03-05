@@ -134,7 +134,7 @@
   }
 
   .kibble-cell {
-    color: #888;
+    color: #4e4e4e;
     text-align: center;
     background: #fafafa;
   }

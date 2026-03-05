@@ -85,7 +85,7 @@
     line-height: 1;
   }
   
-  .sub-header { color: #888; font-size: 1rem; font-weight: 500; }
+  .sub-header { color: #404040; font-size: 1rem; font-weight: 500; }
 
   .image-wrapper { 
     position: relative; 
