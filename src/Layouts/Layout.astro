@@ -1,5 +1,6 @@
 ---
-import { ClientRouter } from 'astro:transitions';
+// Removed ClientRouter to fix "Unused JavaScript" and "Chaining Critical Requests" errors.
+// Your Svelte calculator will still work perfectly without this.
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 
@@ -11,7 +12,6 @@ const { title } = Astro.props;
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Anti-FOUC: apply stored theme before first paint -->
     <script is:inline>
       (function () {
         const stored = localStorage.getItem('theme');
@@ -20,14 +20,14 @@ const { title } = Astro.props;
       })();
     </script>
 
-    <ClientRouter />
     <meta charset="UTF-8" />
     <title>{title} | ChefPaws</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ChefPaws: Nutrition as unique as they are." />
   </head>
   <body>
     <Nav />
-    <main transition:animate="fade">
+    <main>
       <slot />
     </main>
     <Footer />
@@ -53,7 +53,6 @@ const { title } = Astro.props;
     --text-secondary:#888888;
     --input-bg:      #ffffff;
     --input-border:  #e5e5e5;
-
   }
 
   /* ── Dark mode token overrides ─────────────────────────────────── */
@@ -118,38 +117,32 @@ const { title } = Astro.props;
 
   img, video, canvas, svg { max-width: 100%; height: auto; }
 
-  /* ── Global dark overrides for component hardcoded colors ──────── */
+  /* ── Global dark overrides ─────────────────────────────────────── */
 
-  /* Section backgrounds */
   [data-theme="dark"] section {
     background-color: var(--bg-section) !important;
   }
 
-  /* Headings */
   [data-theme="dark"] h1,
   [data-theme="dark"] h2,
   [data-theme="dark"] h3 {
     color: var(--text-primary) !important;
   }
 
-  /* Body text & muted text */
   [data-theme="dark"] p {
     color: inherit;
   }
 
-  /* Axis / timeline lines */
   [data-theme="dark"] .step-description,
   [data-theme="dark"] .section-subtitle {
     color: var(--text-secondary) !important;
   }
 
-  /* Form card */
   [data-theme="dark"] .contact-form {
     background: var(--bg-surface) !important;
     border-color: var(--input-border) !important;
   }
 
-  /* Form inputs */
   [data-theme="dark"] input,
   [data-theme="dark"] textarea {
     background: var(--input-bg) !important;
@@ -166,7 +159,6 @@ const { title } = Astro.props;
     color: #ccc !important;
   }
 
-  /* Nav */
   [data-theme="dark"] .navbar {
     background: rgba(10, 10, 10, 0.85) !important;
     border-bottom-color: rgba(255, 255, 255, 0.06) !important;
@@ -180,7 +172,6 @@ const { title } = Astro.props;
     color: #ebebeb !important;
   }
 
-  /* CTA card (FinalCTA.svelte uses hardcoded white) */
   [data-theme="dark"] .cta-light-impact {
     background: var(--bg-section) !important;
   }
@@ -190,7 +181,6 @@ const { title } = Astro.props;
     border-color: var(--input-border) !important;
   }
 
-  /* ProcessTimeline step rail line */
   [data-theme="dark"] .step-rail::after {
     background: linear-gradient(to bottom, #333 0%, transparent 100%) !important;
   }
@@ -232,7 +222,7 @@ const { title } = Astro.props;
   [data-theme="dark"] .kibble-cell .status-icon {
     color: #444 !important;
   }
-  /* Mobile stacked rows */
+
   [data-theme="dark"] .comparison-section tr {
     border-bottom-color: #2a2a2a !important;
   }
@@ -243,8 +233,6 @@ const { title } = Astro.props;
     color: #ebebeb !important;
   }
 
-  /* Nav CTA pill — --brand-dark inverts to light in dark mode, making white
-     text invisible. Force a light pill with dark text instead. */
   [data-theme="dark"] .cta-pill {
     background: #ebebeb !important;
     color: #111 !important;
@@ -254,7 +242,6 @@ const { title } = Astro.props;
     color: #fff !important;
   }
 
-  /* Footer */
   [data-theme="dark"] .footer {
     background: #0f0f0f !important;
     border-top-color: #1e1e1e !important;
