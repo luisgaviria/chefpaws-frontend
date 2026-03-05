@@ -58,7 +58,7 @@
   }
 
   .eyebrow {
-    color: #ff4d4d;
+    color: #e53333;
     text-transform: uppercase;
     font-weight: 900;
     font-size: 0.75rem;
@@ -184,7 +184,7 @@
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #ed3333;
+      color: #0b0808;
       margin-bottom: 1rem;
       padding: 1rem 1.5rem !important;
     }
