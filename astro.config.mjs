@@ -12,24 +12,39 @@ export default defineConfig({
   adapter: node({
     mode: "standalone",
   }),
-  // FIX: Moves image optimization to the top level for Railway + Sharp
+  // IMAGE OPTIMIZATION: Configured for Railway (Sharp) + Local DDEV
   image: {
     service: {
       entrypoint: "astro/assets/services/sharp",
     },
     remotePatterns: [
+      // Production: Cloudflare R2
       {
         protocol: "https",
         hostname: "pub-cdfac212319d4c7288df0a72323cd4a6.r2.dev",
       },
+      // Local Development: DDEV Backend (Allowing both http and https)
+      {
+        protocol: "http",
+        hostname: "chefpaws-backend.ddev.site",
+      },
+      {
+        protocol: "https",
+        hostname: "chefpaws-backend.ddev.site",
+      },
     ],
-    domains: ["pub-cdfac212319d4c7288df0a72323cd4a6.r2.dev"],
+    // Domains list for broader compatibility across different Astro versions
+    domains: [
+      "pub-cdfac212319d4c7288df0a72323cd4a6.r2.dev",
+      "chefpaws-backend.ddev.site",
+    ],
   },
-  // FIX: Resolves "Critical Request Chaining" by bundling tiny Svelte/JS files together
+  // BUNDLING & PERFORMANCE
   vite: {
     build: {
       rollupOptions: {
         output: {
+          // Fixes the Critical Request Chain and groups node_modules into a vendor bundle
           manualChunks(id) {
             if (id.includes("node_modules")) {
               return "vendor";
