@@ -1,87 +1,3 @@
-<!-- ---
-import Layout from '../Layouts/Layout.astro';
-import Hero from '../components/Hero.astro';
-import FeaturesGrid from '../components/Features.astro';
-import TrustBar from '../components/TrustBar.svelte'; 
-import VisualTeardown from '../components/VisualTeardown.svelte';
-import ComparisonTable from '../components/ComparisonTable.svelte';
-import FinalCTA from '../components/FinalCTA.svelte';
-import type { HomepageResponse, Section } from '../types/drupal';
-
-// Use the slug from the URL. 
-// If the user is at "/", slug will be undefined, so we default to "/"
-const { slug = "/" } = Astro.params;
-
-const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
-
-// We pass the dynamic slug to your Go API
-const response = await fetch(`${API_URL}/page?slug=${slug}`);
-
-if (!response.ok) {
-  // If Drupal doesn't find the page, show a 404 or redirect
-  return Astro.redirect('/404');
-}
-
-const data: HomepageResponse = await response.json();
-
-/** * Mapping of Drupal Paragraph machine names to Astro/Svelte components.
- * This matches the "Type" string your Go API sends back.
- */
-const COMPONENTS = {
-  'paragraph--hero': Hero,
-  'paragraph--features_grid': FeaturesGrid,
-  'paragraph--trust_bar': TrustBar,
-  'paragraph--visual_teardown': VisualTeardown, 
-  'paragraph--comparison_table': ComparisonTable,
-  'paragraph--cta': FinalCTA, // Ensure this matches your Go logic's sectionType
-} as const;
-
-type ComponentKey = keyof typeof COMPONENTS;
----
-
-<Layout title={data.title}>
-  {data.sections && data.sections.map((section: Section) => {
-    
-    // --- 1. Interactive Svelte Components (Need client:load) ---
-    
-    if (section.type === 'paragraph--visual_teardown') {
-      return <VisualTeardown {...(section.content as any)} client:load />;
-    }
-    
-    if (section.type === 'paragraph--trust_bar') {
-      return <TrustBar {...(section.content as any)} client:load />;
-    }
-
-    if (section.type === 'paragraph--cta' || section.type === 'paragraph--final_cta') {
-      return <FinalCTA {...(section.content as any)} client:load />;
-    }
-
-    if (section.type === 'paragraph--comparison_table') {
-      return <ComparisonTable {...(section.content as any)} client:load />;
-    }
-
-    // --- 2. Static Astro Components ---
-    
-    const StaticComponent = COMPONENTS[section.type as ComponentKey];
-    
-    return StaticComponent ? <StaticComponent {...(section.content as any)} /> : (
-      <div class="debug-missing-component">
-        Missing component for: {section.type}
-      </div>
-    );
-  })}
-</Layout>
-
-<style>
-  .debug-missing-component {
-    padding: 2rem;
-    background: #fdf2f2;
-    color: #9b1c1c;
-    border: 1px dashed #f8b4b4;
-    text-align: center;
-    font-family: monospace;
-  }
-</style> -->
 
 ---
 import Layout from '../Layouts/Layout.astro';
@@ -136,7 +52,7 @@ type ComponentKey = keyof typeof COMPONENTS;
         return <VisualTeardown {...(section.content as any)} client:visible />;
       }
       if (section.type === 'paragraph--trust_bar') {
-        return <TrustBar {...(section.content as any)} client:load />;
+        return <TrustBar {...(section.content as any)} client:visible />;
       }
       if (section.type === 'paragraph--cta' || section.type === 'paragraph--final_cta') {
         return <FinalCTA {...(section.content as any)} client:visible />;
