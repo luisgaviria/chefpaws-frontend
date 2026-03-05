@@ -7,10 +7,24 @@
     field_item_description?: string;
   }> = [];
 
-  // Cleanup logic matching your Hero component for S3/Cloudflare paths
+  /**
+   * FIX: Cloudflare Image Resizing
+   * This handles the "Image file is larger than it needs to be" error.
+   * It requests a 160px version (2x for 80px CSS width) directly from the Edge.
+   */
   const resolveMedia = (rawMedia: string | undefined) => {
     if (!rawMedia) return "";
-    return rawMedia.startsWith('http') ? rawMedia : rawMedia;
+
+    // If it's an R2 URL, we route it through Cloudflare's resizing service
+    if (rawMedia.includes('r2.dev')) {
+      const targetWidth = 160; // 2x for Retina sharpness
+      const quality = 85;
+      
+      // We use the chefpaws.com proxy to trigger Cloudflare's Image Resizing
+      return `https://chefpaws.com/cdn-cgi/image/width=${targetWidth},height=${targetWidth},fit=pad,format=auto,quality=${quality}/${rawMedia}`;
+    }
+
+    return rawMedia;
   };
 
   // Determine grid columns based on item count (1, 2, or 3)
@@ -27,6 +41,8 @@
               <img 
                 src={resolveMedia(item.field_icon)} 
                 alt={item.field_item_title || "Trust Icon"} 
+                width="80"
+                height="80"
                 loading="lazy" 
               />
             </div>
@@ -43,8 +59,8 @@
 
 <style>
   .trust-bar {
-    padding: 7rem 2rem; /* Much larger padding for a luxury feel */
-    background-color: #fcfcfc; /* Off-white is easier on the eyes than pure white */
+    padding: 7rem 2rem;
+    background-color: #fcfcfc;
     border-top: 1px solid #f0f0f0;
   }
 
@@ -53,7 +69,7 @@
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 5rem; /* Wide gaps prevent the "cluttered" MVP look */
+    gap: 5rem;
   }
 
   .trust-card {
@@ -64,13 +80,12 @@
     transition: transform 0.3s ease;
   }
 
-  /* Hover effect adds "Life" to the site */
   .trust-card:hover {
     transform: translateY(-5px);
   }
 
   .icon-wrap {
-    width: 80px; /* Bigger presence */
+    width: 80px; 
     height: 80px;
     margin-bottom: 2rem;
     display: flex;
@@ -79,9 +94,10 @@
   }
 
   img {
-    width: 100%;
-    height: auto;
-    /* Keeps lines crisp on your MacBook Pro */
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    /* Keeps lines crisp on high-res displays */
     image-rendering: -webkit-optimize-contrast;
     filter: brightness(0.95);
   }
@@ -90,7 +106,7 @@
     font-size: 1.1rem;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.15em; /* This is the secret to the "Premium" look */
+    letter-spacing: 0.15em;
     margin: 0 0 0.75rem 0;
     color: #1a1a1a;
   }
@@ -99,7 +115,7 @@
     font-size: 0.95rem;
     line-height: 1.6;
     color: #666;
-    max-width: 260px; /* Constraining the width makes it look designed */
+    max-width: 260px;
     margin: 0 auto;
     font-weight: 400;
   }

@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+
 interface Props {
   field_title?: string;
   field_subtitle?: string;
@@ -9,24 +11,31 @@ interface Props {
 const { 
   field_title = "Nutrition as Unique as They Are", 
   field_subtitle = "Stop guessing. Get vet-grade meal portions calculated specifically for your dog.",
-  field_media: rawMedia = "/dog-hero.png",
+  field_media = "/dog-hero.png",
   field_badge = "New: Fresh Beef Recipe"
 } = Astro.props;
 
-// CLEANUP LOGIC:
-// If the URL contains "http", it's already an absolute Cloudflare link.
-// We only want to use the string as-is without adding the Heroku prefix.
-const field_media = rawMedia.startsWith('http') 
-  ? rawMedia 
-  : rawMedia;
+/**
+ * FIX: Image Optimization
+ * We use 1600px as the max-width for a hero. 
+ * Astro will generate smaller versions (640px, 1024px) for mobile/tablet automatically.
+ */
 ---
-
-
-
 
 <section class="hero-wrap" id="parallax-container">
   <div class="visual">
-    <img src={field_media} alt="" loading="eager" fetchpriority="high" />
+    <Image 
+      src={field_media} 
+      alt={field_title}
+      width={1600} 
+      height={900}
+      widths={[640, 1024, 1600]}
+      sizes={`(max-width: 768px) 100vw, 1600px`}
+      quality={80}
+      loading="eager" 
+      fetchpriority="high"
+      class="hero-img"
+    />
     <div class="blob"></div>
   </div>
 
@@ -70,16 +79,13 @@ const field_media = rawMedia.startsWith('http')
     
     layers.forEach((layer) => {
       const speed = parseFloat(layer.getAttribute('data-speed') || "0");
-      // Applying a very small offset
       const yPos = -(scrollY * speed);
-      // Using 3D transform for hardware acceleration
       (layer as HTMLElement).style.transform = `translate3d(0, ${yPos}px, 0)`;
     });
 
     requestAnimationFrame(updateParallax);
   }
 
-  // Only start if not on a low-power device or mobile
   if (window.innerWidth > 768) {
     requestAnimationFrame(updateParallax);
   }
@@ -106,7 +112,8 @@ const field_media = rawMedia.startsWith('http')
     z-index: 1;
   }
 
-  .visual img {
+  /* Updated to target the Astro Image component output */
+  .hero-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -133,16 +140,12 @@ const field_media = rawMedia.startsWith('http')
     align-items: center;
   }
 
-  /* Parallax Layer Smoothing */
   .parallax-layer {
     will-change: transform;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* transition removed here to let RequestAnimationFrame handle the smoothness 
-    
-    Testing a new deployment*/
   }
 
   .badge {
