@@ -1,5 +1,5 @@
-
 ---
+import { getImage } from "astro:assets";
 import Layout from '../Layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import FeaturesGrid from '../components/Features.astro';
@@ -11,25 +11,51 @@ import ProcessTimeline from '../components/ProcessTimeline.astro';
 import ContactForm from '../components/ContactForm.svelte';
 import type { HomepageResponse, Section } from '../types/drupal';
 
-// 1. Capture the slug. [...slug] captures everything after the domain.
 const { slug = "/" } = Astro.params;
-
 const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8080';
 
-// 2. Log for debugging (Check your terminal where Astro is running!)
-console.log(`🚀 Fetching Page: ${slug} from ${API_URL}/page?slug=${slug}`);
-
 const response = await fetch(`${API_URL}/page?slug=${slug}`);
-
-if (!response.ok) {
-  console.error(`❌ API Error: ${response.status}`);
-  return Astro.redirect('/404');
-}
+if (!response.ok) return Astro.redirect('/404');
 
 const data: HomepageResponse = await response.json();
 
-// 3. Log the sections to see if Go is actually sending data
-console.log(`📦 Sections found: ${data.sections?.length || 0}`);
+/**
+ * IMAGE OPTIMIZATION LOGIC
+ * We intercept the R2 URLs and run them through Astro's Sharp engine
+ * before the Svelte components ever see them.
+ */
+const optimizedSections = await Promise.all((data.sections || []).map(async (section: Section) => {
+  
+  // 1. Optimize the Visual Teardown "Bowl" Image
+  if (section.type === 'paragraph--visual_teardown' && section.content.field_teardown_image) {
+    const optimized = await getImage({
+      src: section.content.field_teardown_image,
+      width: 1000,
+      inferSize: true,
+      quality: 75,
+      format: 'webp'
+    });
+    section.content.field_teardown_image = optimized.src;
+  }
+
+  // 2. Optimize the Trust Bar Icons (Shrink from huge R2 files to 160px)
+  if (section.type === 'paragraph--trust_bar' && section.content.field_trust_items) {
+    section.content.field_trust_items = await Promise.all(
+      section.content.field_trust_items.map(async (item: any) => {
+        if (!item.field_icon) return item;
+        const optimizedIcon = await getImage({
+          src: item.field_icon,
+          width: 160,
+          height: 160,
+          quality: 80
+        });
+        return { ...item, field_icon: optimizedIcon.src };
+      })
+    );
+  }
+
+  return section;
+}));
 
 const COMPONENTS = {
   'paragraph--hero': Hero,
@@ -44,10 +70,9 @@ type ComponentKey = keyof typeof COMPONENTS;
 ---
 
 <Layout title={data.title}>
-  {data.sections && data.sections.length > 0 ? (
-    data.sections.map((section: Section) => {
+  {optimizedSections.length > 0 ? (
+    optimizedSections.map((section: Section) => {
       
-      // Svelte Components (Hydrated)
       if (section.type === 'paragraph--visual_teardown') {
         return <VisualTeardown {...(section.content as any)} client:visible />;
       }
@@ -60,8 +85,6 @@ type ComponentKey = keyof typeof COMPONENTS;
       if (section.type === 'paragraph--comparison_table') {
         return <ComparisonTable {...(section.content as any)} client:visible />;
       }
-
-      // ProcessTimeline — explicit mapping because Drupal field name differs from prop name
       if (section.type === 'paragraph--process_steps') {
         return <ProcessTimeline steps={(section.content as any).field_process_steps ?? []} />;
       }
@@ -69,15 +92,13 @@ type ComponentKey = keyof typeof COMPONENTS;
         return <ContactForm {...(section.content as any)} client:load />;
       }
 
-      // Static Astro Components
       const StaticComponent = COMPONENTS[section.type as ComponentKey];
       return StaticComponent ? <StaticComponent {...(section.content as any)} /> : null;
     })
   ) : (
-    /* 4. Fallback UI if data.sections is empty */
     <div class="empty-state">
       <h1>No content found for "{slug}"</h1>
-      <p>Check if the page is published in Drupal and that the Paragraphs are added.</p>
+      <p>Check your Drupal backend or Go API logs.</p>
     </div>
   )}
 </Layout>
@@ -90,6 +111,5 @@ type ComponentKey = keyof typeof COMPONENTS;
     justify-content: center;
     min-height: 50vh;
     text-align: center;
-    font-family: sans-serif;
   }
 </style>
