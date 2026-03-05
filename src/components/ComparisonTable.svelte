@@ -195,7 +195,7 @@
       font-weight: 900;
       text-transform: uppercase;
       font-size: 0.7rem;
-      color: #bbb;
+      color: #696969;
       letter-spacing: 0.1em;
     }
 
