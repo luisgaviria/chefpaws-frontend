@@ -69,7 +69,7 @@
   .header { margin-bottom: clamp(2rem, 5vw, 4rem); }
   
   .eyebrow { 
-    color: #ff4d4d; 
+    color: #f83f3f; 
     text-transform: uppercase; 
     font-weight: 900; 
     font-size: 0.75rem; 
@@ -85,7 +85,7 @@
     line-height: 1;
   }
   
-  .sub-header { color: #404040; font-size: 1rem; font-weight: 500; }
+  .sub-header { color: #2e2d2d; font-size: 1rem; font-weight: 500; }
 
   .image-wrapper { 
     position: relative; 

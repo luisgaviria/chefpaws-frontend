@@ -99,7 +99,7 @@
     border-bottom: 1px solid #eee;
   }
 
-  .feature-head { color: #aaa; width: 30%; }
+  .feature-head { color: #696969; width: 30%; }
   
   .brand-head { 
     background: #ff4d4d; 
@@ -108,7 +108,7 @@
   }
   
   .competitor-head { 
-    color: #aaa; 
+    color: #545454; 
     text-align: center; 
     background: #fafafa;
   }
@@ -134,7 +134,7 @@
   }
 
   .kibble-cell {
-    color: #4e4e4e;
+    color: #414040;
     text-align: center;
     background: #fafafa;
   }
