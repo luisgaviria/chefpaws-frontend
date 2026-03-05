@@ -145,7 +145,7 @@
   }
 
   .chefpaws-cell .status-icon { color: #ff4d4d; }
-  .kibble-cell .status-icon { color: #ddd; }
+  .kibble-cell .status-icon { color: #464646; }
 
   /* --- MOBILE STYLES (THE FIX) --- */
   @media (max-width: 850px) {
